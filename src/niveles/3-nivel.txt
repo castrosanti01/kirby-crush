@@ -1,0 +1,33 @@
+# Archivo de configuración del Nivel 3
+Nivel: 3
+# Tamaño del tablero (filas y columnas)
+Filas: 7
+Columnas: 7
+
+# Cantidad de movimientos disponibles
+Movimientos: 15
+
+# Objetivo del nivel
+Objetivo: Eliminar 20 caramelos de color verde y 20 de color marron en 25 movimientos o menos
+VerdesFaltantes: 3
+AmarillosFaltantes: 2
+
+# Tiempo límite en segundos
+Tiempo: 0
+
+# Reglas de matchs:
+# 0 : Vale todo (Regla Match 3 + Regla Match 4 + Regla Match L, +, T)
+# 1 : Regla Match 3 + Regla Match 4 
+# 2 : Regla Match 3 + Regla Match L, +, T
+# 3 : Regla Match 3 
+ReglaDeMatch: 0
+
+# Definición del tablero
+Tablero: (crear)
+71 74 72 74 1 2 3 
+75 73 72 71 5 3 1 
+71 71 74 72 1 2 3 
+3 5 1 3 2 4 3 
+6 6 6 71 73 71 71 
+6 6 6 75 71 75 74 
+6 6 6 72 73 75 72 
