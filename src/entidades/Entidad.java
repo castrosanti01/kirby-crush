@@ -95,10 +95,6 @@ public abstract class Entidad implements EntidadLogica, Enfocable, Intercambiabl
 		o.chequear_objetivo(this);
 	}
 	
-	public boolean tiene_gravedad() {
-    	return true;
-    }
-	
 	@Override
 	public void cambiar_posicion(int nf, int nc) {
 		fila = nf;
@@ -130,10 +126,6 @@ public abstract class Entidad implements EntidadLogica, Enfocable, Intercambiabl
 		detonada = true;
 		entidad_grafica.notificarse_detonar();
 		mi_tablero.notificar_sumar_puntaje(this.get_puntaje());
-	}
-	
-	public boolean detona_con_swap() {
-		return false;
 	}
 	
 	/**

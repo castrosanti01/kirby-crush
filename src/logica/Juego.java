@@ -1,6 +1,5 @@
 package logica;
 
-
 import java.awt.EventQueue;
 import java.util.List;
 import entidades.Entidad;
@@ -15,227 +14,222 @@ import GUI.Ventana;
  */
 public class Juego {
 
-  public static final int ARRIBA = 15000;
-  public static final int ABAJO = 15001;
-  public static final int IZQUIERDA = 15002;
-  public static final int DERECHA = 15003;
+	public static final int ARRIBA = 15000;
+	public static final int ABAJO = 15001;
+	public static final int IZQUIERDA = 15002;
+	public static final int DERECHA = 15003;
 
-  protected Tablero mi_tablero;
-  protected Ventana mi_ventana;
-  protected Nivel mi_nivel;
-  protected ManagerObjetivos manager_objetivos;
-  protected TopJugadores ranking;
-  protected AbstractFactory skin;
-  private Jugador jugador_actual;  
-  protected int movimientos;
-  protected int tiempo_restante;
-  protected int contador_puntos;
-  public int vidas = 3;
+	protected Tablero mi_tablero;
+	protected Ventana mi_ventana;
+	protected Nivel mi_nivel;
+	protected ManagerObjetivos manager_objetivos;
+	protected TopJugadores ranking;
+	protected AbstractFactory skin;
+	private Jugador jugador_actual;  
+	protected int movimientos;
+	protected int tiempo_restante;
+	protected int contador_puntos;
+	public int vidas = 3;
 
-  public Juego() {
-    mi_tablero = new Tablero(this);
-    mi_ventana = new Ventana(this);
-    ranking = new TopJugadores();
-    jugador_actual = new Jugador();
-  }
-  
-  public void cargarDatos(AbstractFactory generador) {
-	  mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/1-nivel.txt"), generador, mi_tablero);
-	  skin = generador;
-  }
-  
-  public void asociar() {
-	  asociar_entidades_logicas_graficas();
-	  mi_tablero.fijar_jugador(mi_nivel.get_fila_inicial_jugador(),mi_nivel.get_columna_inicial_jugador());
-  }
+	public Juego() {
+		mi_tablero = new Tablero(this);
+		mi_ventana = new Ventana(this);
+		ranking = new TopJugadores();
+		jugador_actual = new Jugador();
+	}
 
-  public void mover_jugador(int d) {
-    mi_tablero.mover_jugador(d);
-  }
+	public void cargarDatos(AbstractFactory generador) {
+		mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/1-nivel.txt"), generador, mi_tablero);
+		skin = generador;
+	}
 
-  public void intercambiar_entidades(int d) {
-    mi_tablero.intercambiar_entidades(d);
-  }
+	public void asociar() {
+		asociar_entidades_logicas_graficas();
+		mi_tablero.fijar_jugador(mi_nivel.get_fila_inicial_jugador(),mi_nivel.get_columna_inicial_jugador());
+	}
 
-  public void asociar_entidad_logica_grafica_nueva(Entidad e, int fila) {
-	  //Caramelos que caen
-	  EntidadGrafica eg = mi_ventana.agregar_entidad_nueva(e, fila);
-	  e.set_entidad_grafica(eg);
-  }
-  
-  public void asociar_entidad_logica_grafica_nueva(Potenciador p) {
-	  //Potenciadores que aparecen luego de la detonacion
-	  EntidadGrafica eg = mi_ventana.agregar_entidad_nueva(p);
-	  p.set_entidad_grafica(eg);
-  }
-  
-  private void asociar_entidades_logicas_graficas() {
-    Entidad e;
-    EntidadGrafica eg;
+	public void mover_jugador(int d) {
+		mi_tablero.mover_jugador(d);
+	}
 
-    for (int f = 0; f < mi_tablero.get_filas(); f++) {
-      for (int c = 0; c < mi_tablero.get_columnas(); c++) {
-	        e = mi_tablero.get_entidad(f, c);
-	        eg = mi_ventana.agregar_entidad(e);
-	        e.set_entidad_grafica(eg);
-      }
-    }
-    
-    mi_ventana.setLocationRelativeTo(null);
-    mi_ventana.setVisible(false);
-  }
-  
-  public Tablero getTablero() {
-	  return mi_tablero;
-  }
+	public void intercambiar_entidades(int d) {
+		mi_tablero.intercambiar_entidades(d);
+	}
 
-  public TopJugadores getTopJugadores() {
-	  return ranking;
-  }
-  
-  public static void main(String[] args) {
-    EventQueue.invokeLater(new Runnable() {
-      public void run() {
-        try {
-          new Juego();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    });
-  }
+	public void asociar_entidad_logica_grafica_nueva(Entidad e, int fila) {
+		//Caramelos que caen
+		EntidadGrafica eg = mi_ventana.agregar_entidad_nueva(e, fila);
+		e.set_entidad_grafica(eg);
+	}
 
-  public void notificarMovimiento() {
-    movimientos--;
-    mi_ventana.contadorMovimientos.setText("Movimientos: " + movimientos);
-    if (movimientos == 0)
-      mi_ventana.mostrarGameOver();
-  }
+	public void asociar_entidad_logica_grafica_nueva(Potenciador p) {
+		//Potenciadores que aparecen luego de la detonacion
+		EntidadGrafica eg = mi_ventana.agregar_entidad_nueva(p);
+		p.set_entidad_grafica(eg);
+	}
 
-  public void reiniciarNivel() {
-    switch (nivelActual()) {
-      case 1:
-        mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/1-nivel.txt"), skin, mi_tablero);
-        break;
-      case 2:
-        mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/2-nivel.txt"), skin, mi_tablero);
-        break;
-      case 3:
-        mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/3-nivel.txt"), skin, mi_tablero);
-        break;
-      case 4:
-        mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/4-nivel.txt"), skin, mi_tablero);
-        break;
-      case 5:
-        mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/5-nivel.txt"), skin, mi_tablero);
-        break;
-      default:
-        // no change
-        break;
-    }
+	private void asociar_entidades_logicas_graficas() {
+		Entidad e;
+		EntidadGrafica eg;
 
-    // Actualizar la representación gráfica
-    mi_ventana.limpiarEntidades(); // Este método debería eliminar todas las entidades gráficas
-                                   // actuales
-    asociar_entidades_logicas_graficas(); // Vuelve a asociar las entidades lógicas con las
-                                          // entidades gráficas
+		for (int f = 0; f < mi_tablero.get_filas(); f++) {
+			for (int c = 0; c < mi_tablero.get_columnas(); c++) {
+				e = mi_tablero.get_entidad(f, c);
+				eg = mi_ventana.agregar_entidad(e);
+				e.set_entidad_grafica(eg);
+			}
+		}
+		mi_ventana.setLocationRelativeTo(null);
+	}
 
-    mi_tablero.fijar_jugador(mi_nivel.get_fila_inicial_jugador(), mi_nivel.get_columna_inicial_jugador());
-    set_movimientos();
-    mi_ventana.contadorMovimientos.setText("Movimientos: " + movimientos);
-    vidas--;
-    jugador_actual.resetear_puntaje();
-    mi_ventana.contadorPuntaje.setText("Puntaje: " + jugador_actual.get_puntaje_acumulado());
-    // Repintar la ventana
-    mi_ventana.repaint();
-  }
+	public Tablero getTablero() {
+		return mi_tablero;
+	}
+
+	public TopJugadores getTopJugadores() {
+		return ranking;
+	}
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					new Juego();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	public void notificarMovimiento() {
+		movimientos--;
+		mi_ventana.contadorMovimientos.setText("Movimientos: " + movimientos);
+		if (movimientos == 0)
+			mi_ventana.mostrarGameOver();
+	}
+
+	public void reiniciarNivel() {
+		switch (nivelActual()) {
+			case 1:
+			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/1-nivel.txt"), skin, mi_tablero);
+			break;
+			case 2:
+			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/2-nivel.txt"), skin, mi_tablero);
+			break;
+			case 3:
+			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/3-nivel.txt"), skin, mi_tablero);
+			break;
+			case 4:
+			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/4-nivel.txt"), skin, mi_tablero);
+			break;
+			case 5:
+			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/5-nivel.txt"), skin, mi_tablero);
+			break;
+			default:
+			break;
+		}
+
+		// Actualizar la representación gráfica
+		mi_ventana.limpiarEntidades(); 
+		asociar_entidades_logicas_graficas(); 
+
+		mi_tablero.fijar_jugador(mi_nivel.get_fila_inicial_jugador(), mi_nivel.get_columna_inicial_jugador());
+		set_movimientos();
+		mi_ventana.contadorMovimientos.setText("Movimientos: " + movimientos);
+		vidas--;
+		jugador_actual.resetear_puntaje();
+		mi_ventana.contadorPuntaje.setText("Puntaje: " + jugador_actual.get_puntaje_acumulado());
+		// Repintar la ventana
+		mi_ventana.repaint();
+	}
 
 
-  public void set_movimientos() {
-    movimientos = mi_nivel.get_movimientos();
-  }
+	public void set_movimientos() {
+		movimientos = mi_nivel.get_movimientos();
+	}
 
-  public int get_movimientos() {
-    return movimientos;
-  }
+	public int get_movimientos() {
+		return movimientos;
+	}
 
-  public void set_tiempo_restante() {
-    tiempo_restante = mi_nivel.get_tiempo_restante();
-  }
+	public void set_tiempo_restante() {
+		tiempo_restante = mi_nivel.get_tiempo_restante();
+	}
 
-  public int get_tiempo_restante() {
-    return tiempo_restante;
-  }
+	public int get_tiempo_restante() {
+		return tiempo_restante;
+	}
 
-  public int getVidas() {
-    return vidas;
-  }
-  
-  public void chequeo_nivel() {
-	  boolean termino_nivel = manager_objetivos.get_lista().size() == 0;
-	  if (termino_nivel) {
-		  mi_ventana.ganarNivel();
-	      if (nivelActual() == 5)
-	    	  mi_ventana.terminarJuego();
-	    }
-  }
-  
-  public List<Objetivo> actualizar_manager_objetivos() {
-	  manager_objetivos = mi_nivel.get_manager_objetivos();
-	  mi_tablero.actualizar_manager_objetivos(manager_objetivos);
-	return manager_objetivos.get_lista();
-  }
-  
-  public ManagerObjetivos get_manager_objetivos() {
-	  return manager_objetivos;
-  }
-  
-  public void actualizar_objetivos() {
-	  mi_ventana.actualizar_objetivos(manager_objetivos.get_lista());
-  }
-  
-  public void cargarProximoNivel() {
-    switch (nivelActual()) {
-      case 1:
-        mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/2-nivel.txt"), skin, mi_tablero);
-        break;
-      case 2:
-        mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/3-nivel.txt"), skin, mi_tablero);
-        break;
-      case 3:
-        mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/4-nivel.txt"), skin, mi_tablero);
-        break;
-      case 4:
-        mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/5-nivel.txt"), skin, mi_tablero);
-        break;
-      default:
-        break;
-    }
-	  tiempo_restante = mi_nivel.get_tiempo_restante();
-	  movimientos = mi_nivel.get_movimientos();
-	  vidas = 3;
-	  
-	  asociar_entidades_logicas_graficas(); // Vuelve a asociar las entidades lógicas con las entidades gráficas
+	public int getVidas() {
+		return vidas;
+	}
 
-	  mi_tablero.fijar_jugador(mi_nivel.get_fila_inicial_jugador(),
-	  mi_nivel.get_columna_inicial_jugador());
-	  mi_ventana.contadorMovimientos.setText("Movimientos: " + movimientos);
-	  jugador_actual.sumar_puntos_del_nivel();
-	  mi_ventana.contadorPuntaje.setText("Puntaje: " + jugador_actual.get_puntaje_acumulado());
-	  
-	  mi_ventana.repaint();
-	  
-	  mi_ventana.bloquearNivelesAnteriores();
-  }
-  
-  public int nivelActual() {
-	  return mi_nivel.get_nro_nivel();
-  }
+	public void chequeo_nivel() {
+		boolean termino_nivel = manager_objetivos.get_lista().size() == 0;
+		if (termino_nivel) {
+			mi_ventana.ganarNivel();
+			if (nivelActual() == 5)
+				mi_ventana.terminarJuego();
+		}
+	}
+
+	public List<Objetivo> actualizar_manager_objetivos() {
+		manager_objetivos = mi_nivel.get_manager_objetivos();
+		mi_tablero.actualizar_manager_objetivos(manager_objetivos);
+		return manager_objetivos.get_lista();
+	}
+
+	public ManagerObjetivos get_manager_objetivos() {
+		return manager_objetivos;
+	}
+
+	public void actualizar_objetivos() {
+		mi_ventana.actualizar_objetivos(manager_objetivos.get_lista());
+	}
+
+	public void cargarProximoNivel() {
+		switch (nivelActual()) {
+			case 1:
+			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/2-nivel.txt"), skin, mi_tablero);
+			break;
+			case 2:
+			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/3-nivel.txt"), skin, mi_tablero);
+			break;
+			case 3:
+			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/4-nivel.txt"), skin, mi_tablero);
+			break;
+			case 4:
+			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/5-nivel.txt"), skin, mi_tablero);
+			break;
+			default:
+			break;
+		}
+		tiempo_restante = mi_nivel.get_tiempo_restante();
+		movimientos = mi_nivel.get_movimientos();
+		vidas = 3;
+		
+		asociar_entidades_logicas_graficas(); // Vuelve a asociar las entidades lógicas con las entidades gráficas
+
+		mi_tablero.fijar_jugador(mi_nivel.get_fila_inicial_jugador(),
+		mi_nivel.get_columna_inicial_jugador());
+		mi_ventana.contadorMovimientos.setText("Movimientos: " + movimientos);
+		jugador_actual.sumar_puntos_del_nivel();
+		mi_ventana.contadorPuntaje.setText("Puntaje: " + jugador_actual.get_puntaje_acumulado());
+		
+		mi_ventana.repaint();
+		
+		mi_ventana.bloquearNivelesAnteriores();
+	}
+
+	public int nivelActual() {
+		return mi_nivel.get_nro_nivel();
+	}
 
 	public void setGenerador(AbstractFactory generador) {
 		skin = generador;
 	}
-	
+
 	public AbstractFactory getGenerador() {
 		return skin;
 	}
@@ -259,7 +253,7 @@ public class Juego {
 	public void set_jugador_actual(Jugador jugador_actual) {
 		this.jugador_actual = jugador_actual;
 	}
-	
+
 	public void set_top_jugadores(TopJugadores ranking) {
 		this.ranking = ranking;
 	}

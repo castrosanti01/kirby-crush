@@ -31,9 +31,6 @@ public class GeneradorNivel {
       int azules = 0;
       int violetas = 0;
       int rosas = 0;
-      int gelatinas = 0;
-      int glaseados = 0;
-      int reglaMatch = -1;
       
       ManagerObjetivos manager_objetivos = new ManagerObjetivos();
       Objetivo objetivosVerdes = new Objetivo(0);
@@ -89,18 +86,6 @@ public class GeneradorNivel {
             case "RosasFaltantes":
               rosas = Integer.parseInt(valor);
               break;
-            case "GelatinasFaltantes":
-              gelatinas = Integer.parseInt(valor);
-              break;
-            case "GlaseadosFaltantes":
-              glaseados = Integer.parseInt(valor);
-              break;
-            case "Tiempo":
-              tiempo = Integer.parseInt(valor);
-              break;
-            case "ReglaDeMatch":
-                reglaMatch = Integer.parseInt(valor);
-                break;
             case "Tablero":
               leyendoTablero = true;
               break;
@@ -159,15 +144,7 @@ public class GeneradorNivel {
     	  objetivosRosas = new Objetivo ("/imagenes/caramelos/"+generador.toString()+"-5.png", rosas);
     	  manager_objetivos.suscribirse(objetivosRosas);
       }
-      if (glaseados > 0) {
-      	 objetivoGlaseados = new Objetivo("/imagenes/glaseados/"+generador.toString()+"-6.png",glaseados);
-      		 manager_objetivos.suscribirse(objetivoGlaseados);
-       }
-      if (gelatinas > 0) {
-     	 objetivoGelatinas = new Objetivo("/imagenes/gelatina/7.png", gelatinas);
-     	 manager_objetivos.suscribirse(objetivoGelatinas);
-      }
-     
+
      // Crear y devolver el nivel con las características y el tablero cargados 
      return new Nivel.Builder()
           .nivelActual(nivel)
@@ -176,7 +153,6 @@ public class GeneradorNivel {
           .objetivo(objetivo)
           .cantidadMovimientos(movimientos)
           .tiempoLimite(tiempo)
-          .reglaDeMatch(reglaMatch)
           .ObjetivoVerde(objetivosVerdes)
           .ObjetivoAmarillo(objetivosAmarillos)
           .ObjetivoAzul(objetivosAzules)

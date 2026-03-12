@@ -7,7 +7,7 @@ import java.util.List;
 import entidades.*;
 
 public class Tablero {
-
+	
 	protected Juego mi_juego;
 	protected Entidad[][] entidades;
 	protected ManagerObjetivos manager_objetivos;
@@ -123,8 +123,6 @@ public class Tablero {
 		int diferencia_columnas = pos_c_jugador - nc;
 		boolean movimiento_vertical = false;
 		
-		boolean detona_con_swap = false;
-		
 		if(diferencia_filas != 0 && diferencia_columnas == 0)
 			movimiento_vertical = true;
 
@@ -136,17 +134,10 @@ public class Tablero {
 				List<Entidad> eliminar = lista_a_eliminar(nf, nc);
 				List<Entidad> eliminar_2 = lista_a_eliminar(pos_f_anterior, pos_c_anterior);
 				
-				if(eliminar.size() == 2) {
-					for(Entidad e : eliminar)
-						if(e.detona_con_swap())
-							detona_con_swap = true;
-				}
-        
-				// Si el contador es menor que 3, revertir el intercambio
-				if(eliminar.size() >= 3 | eliminar_2.size() >= 3 | detona_con_swap) {
+				// Si el contador es mayor que 3 eliminamos, sino revertimos el intercambio
+				if(eliminar.size() >= 3 | eliminar_2.size() >= 3 ) {
 					procesar_eliminacion(eliminar, movimiento_vertical);
 					procesar_eliminacion(eliminar_2, movimiento_vertical);
-					aplicar_intercambio(nf, nc, pos_f_anterior, pos_c_anterior);
 					nf = pos_f_jugador;
 				    nc = pos_c_jugador;
 					
@@ -183,10 +174,10 @@ public class Tablero {
 	}
 	
 	private void procesar_eliminacion(List<Entidad> eliminar, boolean movimiento_vertical) {
-		if(eliminar.size() == 2) 
+		/*if(eliminar.size() == 2) 
 			for(Entidad e : eliminar) 
 				e.detonar();
-		else if(eliminar.size() == 3) 
+		else*/ if(eliminar.size() == 3) 
 			match_simple(eliminar);
 	  	else if(eliminar.size() == 4)
   			match_cuatro(eliminar, movimiento_vertical);
@@ -194,29 +185,6 @@ public class Tablero {
   			match_multiple(eliminar);
 	}
 	
-	private void verificar_glaseados(List<Entidad> eliminar) {
-		List<Entidad> glaseados = new ArrayList<>();
-
-		// Definimos las coordenadas relativas de los elementos circundantes.
-		int[][] coordenadas_relativas = {
-		    {-1, 0}, {1, 0},   	//abajo, arriba
-		    {0, -1},  {0, +1},	//izquierda, derecha
-		};
-		
-		for(Entidad e: eliminar) 
-			for(int[] coordenada : coordenadas_relativas){
-			    int nueva_fila = e.get_fila() + coordenada[0];
-			    int nueva_col = e.get_columna() + coordenada[1];
-			    if(en_rango(nueva_fila, nueva_col))
-			    	if(!entidades[nueva_fila][nueva_col].tiene_gravedad())
-				        if(!eliminar.contains(entidades[nueva_fila][nueva_col]) && !glaseados.contains(entidades[nueva_fila][nueva_col]))
-				        	glaseados.add(entidades[nueva_fila][nueva_col]);
-			}
-		for(Entidad e: glaseados) {
-			eliminar.add(e);
-		}
-	}
-
 	private void match_multiple(List<Entidad> eliminar) {
 		//Para generar el potenciador envuelto
 		if(eliminar.size() > 2) {
@@ -234,7 +202,6 @@ public class Tablero {
 			
 			//Verfico que tenga forma de L, T, +
 			if(!misma_columna && !misma_fila) {
-				verificar_glaseados(eliminar);
 				
 				//Eliminacion del que va a ser reeeplazado por el potenciador
 			    Entidad entidad_a_cambiar = entidades[eliminar.get(0).get_fila()][eliminar.get(0).get_columna()];
@@ -266,7 +233,6 @@ public class Tablero {
 	private void match_cuatro(List<Entidad> eliminar, boolean movimiento_vertical) {
 		//Para generar el potenciador rayado
 		if(eliminar.size() > 2) {
-			verificar_glaseados(eliminar);
 			
 			//Eliminacion del que va a ser reeeplazado por el potenciador
 		    Entidad entidad_a_cambiar = entidades[eliminar.get(0).get_fila()][eliminar.get(0).get_columna()];
@@ -296,10 +262,7 @@ public class Tablero {
   }
 
 	private void match_simple(List<Entidad> eliminar) {
-		if(eliminar.size() > 2) {
-			verificar_glaseados(eliminar);
-		    detonacion_y_creacion(eliminar);
-		}
+		detonacion_y_creacion(eliminar);
 	}
 	
 	private void detonacion_y_creacion(List<Entidad> eliminar) {
@@ -312,44 +275,16 @@ public class Tablero {
 		mi_juego.actualizar_objetivos();
 		
 		int fila_aux = -1;
-		Entidad entidad_sin_gravedad = null;
 		
 		for(Entidad e : eliminar) {
-		    boolean hay_e_sin_gravedad_en_la_fila = false;
-
-		    // Encuentra la entidad sin gravedad con la fila más alta (la que está última visualmente)
-		    for (int f = filas - 1; f > 0 && !hay_e_sin_gravedad_en_la_fila; f--)
-		        if (!entidades[f][e.get_columna()].tiene_gravedad()) {
-		            hay_e_sin_gravedad_en_la_fila = true;
-		            entidad_sin_gravedad = entidades[f][e.get_columna()];
-		        }
-
-		    if (!hay_e_sin_gravedad_en_la_fila) {
-		    	if(entidades[e.get_fila()][e.get_columna()].get_detonada()) {
-			        subir_vacio(e.get_fila(), e.get_columna());
-			        Entidad nuevo_caramelo;
-			        nuevo_caramelo = new Caramelo(e.get_fila(), e.get_columna(), Color.color_random(), "/imagenes/caramelos/" + mi_juego.getGenerador().toString() + "-", this);
-			        agregar_entidad(nuevo_caramelo);
-			        mi_juego.asociar_entidad_logica_grafica_nueva(nuevo_caramelo, fila_aux);
-			        nuevo_caramelo.caer(e.get_fila(), e.get_columna());
-			        fila_aux--;
-		    	}
-		    } else {
-		        if (e.get_fila() > entidad_sin_gravedad.get_fila())
-		            // Match abajo de la caja sin tocarla
-		            subir_vacio(e.get_fila(), e.get_columna());
-		        else if (e.get_fila() < entidad_sin_gravedad.get_fila()) {
-		            // Match arriba de la caja sin tocarla
-		        	if(entidades[e.get_fila()][e.get_columna()].get_detonada()) {
-			        	subir_vacio(e.get_fila(), e.get_columna());
-			            Entidad nuevo_caramelo;
-			            nuevo_caramelo = new Caramelo(e.get_fila(), e.get_columna(), Color.color_random(), "/imagenes/caramelos/" + mi_juego.getGenerador().toString() + "-", this);
-			            agregar_entidad(nuevo_caramelo);
-			            mi_juego.asociar_entidad_logica_grafica_nueva(nuevo_caramelo, fila_aux);
-			            nuevo_caramelo.caer(e.get_fila(), e.get_columna());
-			            fila_aux--;
-		        	}
-		        }
+			if(entidades[e.get_fila()][e.get_columna()].get_detonada()) {
+			    subir_vacio(e.get_fila(), e.get_columna());
+			    Entidad nuevo_caramelo;
+		        nuevo_caramelo = new Caramelo(e.get_fila(), e.get_columna(), Color.color_random(), "/imagenes/caramelos/" + mi_juego.getGenerador().toString() + "-", this);
+		        agregar_entidad(nuevo_caramelo);
+		        mi_juego.asociar_entidad_logica_grafica_nueva(nuevo_caramelo, fila_aux);
+		        nuevo_caramelo.caer(e.get_fila(), e.get_columna());
+		        fila_aux--;
 		    }
 		}
 	}
@@ -447,7 +382,7 @@ public class Tablero {
 	}
 	
 	private void subir_vacio(int f, int c) {
-		if(f > 0 && entidades[f-1][c].tiene_gravedad()) {
+		if(f > 0) {
 			aplicar_caida(f, c, f-1, c);
 			subir_vacio(f-1,c);
 		}
