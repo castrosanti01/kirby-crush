@@ -29,23 +29,8 @@ public class Envuelto extends Potenciador {
 	}
 
 	@Override
-	public boolean puede_recibir(Glaseado g) {
-		return false;
-	}
-	
-	@Override
 	public boolean puede_recibir(Potenciador p) {
 		return true;
-	}
-	
-	@Override
-	public boolean puede_recibir(TdP1 tdp1) {
-	    return true;
-	}
-
-	@Override
-	public boolean puede_recibir(TdP2 tdp2) {
-	    return true;
 	}
 	
 	@Override

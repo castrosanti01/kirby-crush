@@ -23,25 +23,7 @@ public interface Intercambiable {
 	 * @param g Glaseado con el que se analiza el intercambio.
 	 * @return True si el intercambio es posible, false en caso contrario.
 	 */
-	public boolean puede_recibir(Glaseado g);
-	/**
-	 * Indica si es posible que la entidad receptora pueda ser intercambiada de posición con el Potenciador parametrizado.
-	 * @param p Potenciador con el que se analiza el intercambio.
-	 * @return True si el intercambio es posible, false en caso contrario.
-	 */
 	public boolean puede_recibir(Potenciador p);
-	/**
-     * Indica si es posible que la entidad receptora pueda ser intercambiada de posición con el caramelo TdP1 parametrizado.
-     * @param tdp TdP1 con el que se analiza el intercambio.
-     * @return True si el intercambio es posible, false en caso contrario.
-     */
-    public boolean puede_recibir(TdP1 tdp);
-    /**
-     * Indica si es posible que la entidad receptora pueda ser intercambiada de posición con el caramelo TdP2 parametrizado.
-     * @param tdp TdP2 con el que se analiza el intercambio.
-     * @return True si el intercambio es posible, false en caso contrario.
-     */
-    public boolean puede_recibir(TdP2 tdp);
 	/**
 	 * Fija la nueva posición de la entidad receptora del mensaje.
 	 * Notifica a la entidad gráfica del cambio realizado.

@@ -29,23 +29,8 @@ public class RayadoVertical extends Potenciador {
 	}
 
 	@Override
-	public boolean puede_recibir(Glaseado g) {
-		return false;
-	}
-	
-	@Override
 	public boolean puede_recibir(Potenciador p) {
 		return true;
-	}
-	
-	@Override
-	public boolean puede_recibir(TdP1 tdp) {
-	    return true;
-	}
-	
-	@Override
-	public boolean puede_recibir(TdP2 tdp) {
-	    return true;
 	}
 	
 	@Override

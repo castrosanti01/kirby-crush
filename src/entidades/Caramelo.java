@@ -3,9 +3,6 @@ package entidades;
 import logica.Objetivo;
 import logica.Tablero;
 
-/**
- * Modela el comportamiento de los Caramelos.
- */
 public class Caramelo extends Entidad {
 	
     public Caramelo(int f, int c, Color col, String path_img, Tablero t) {
@@ -23,25 +20,10 @@ public class Caramelo extends Entidad {
 	}
 	
     @Override
-	public boolean puede_recibir(Glaseado g) {
-		return false;
-	}
-	
-    @Override
 	public boolean puede_recibir(Potenciador p) {
 		return true;
 	}
 	
-    @Override
-	public boolean puede_recibir(TdP1 tdp1) {
-	    return true;
-	}
-
-    @Override
-	public boolean puede_recibir(TdP2 tdp2) {
-	    return true;
-	}
-    
 	private static int calcular_puntaje(Color color) {
       int puntaje = 0;
       switch (color) {

@@ -107,8 +107,6 @@ public class GeneradorNivel {
           }
           if (leyendoTablero) {
             tablero.resetar_tablero(filas, columnas);
-            tablero.resetar_gelatinas(filas, columnas);
-
           }
         } else if (linea.trim().length() > 0 && leyendoTablero && filaActual < filas) {
           String[] valores = linea.split(" ");
@@ -130,61 +128,6 @@ public class GeneradorNivel {
             	  break;
               case 5:
             	  tablero.agregar_entidad(generador.crearCaramelo(filaActual, j, Color.ROSA, tablero));
-            	  break;
-              // CASO GLASEADO
-              case 6:
-            	  tablero.agregar_entidad(generador.crearGlaseado(filaActual, j, Color.EMPTY, tablero));
-            	  break;
-              // CASO GELATINA
-              case 71:
-            	  tablero.agregar_entidad(generador.crearCaramelo(filaActual, j, Color.VERDE, tablero));
-            	  tablero.agregar_asociada(new Gelatina(filaActual, j));
-            	  break;
-              case 72:
-            	  tablero.agregar_entidad(generador.crearCaramelo(filaActual, j, Color.AMARILLO, tablero));
-            	  tablero.agregar_asociada(new Gelatina(filaActual, j));
-            	  break;
-              case 73:
-            	  tablero.agregar_entidad(generador.crearCaramelo(filaActual, j, Color.AZUL, tablero));
-            	  tablero.agregar_asociada(new Gelatina(filaActual, j));
-            	  break;
-              case 74:
-            	  tablero.agregar_entidad(generador.crearCaramelo(filaActual, j, Color.VIOLETA, tablero));
-            	  tablero.agregar_asociada(new Gelatina(filaActual, j));
-            	  break;
-              case 75:
-            	  tablero.agregar_entidad(generador.crearCaramelo(filaActual, j, Color.ROSA, tablero));
-            	  tablero.agregar_asociada(new Gelatina(filaActual, j));
-            	  break;
-              case 81:
-            	  tablero.agregar_entidad(generador.crearTdP2(filaActual, j, Color.VERDE, tablero));
-            	  break;
-              case 82:
-            	  tablero.agregar_entidad(generador.crearTdP2(filaActual, j, Color.AMARILLO, tablero));
-            	  break;
-              case 83:
-            	  tablero.agregar_entidad(generador.crearTdP2(filaActual, j, Color.AZUL, tablero));
-            	  break;
-              case 84:
-            	  tablero.agregar_entidad(generador.crearTdP2(filaActual, j, Color.VIOLETA, tablero));
-            	  break;
-              case 85:
-            	  tablero.agregar_entidad(generador.crearTdP2(filaActual, j, Color.ROSA, tablero));
-            	  break;
-              case 91:
-            	  tablero.agregar_entidad(generador.crearTdP1(filaActual, j, Color.VERDE, tablero));
-            	  break;
-              case 92:
-            	  tablero.agregar_entidad(generador.crearTdP1(filaActual, j, Color.AMARILLO, tablero));
-            	  break;
-              case 93:
-            	  tablero.agregar_entidad(generador.crearTdP1(filaActual, j, Color.AZUL, tablero));
-            	  break;
-              case 94:
-            	  tablero.agregar_entidad(generador.crearTdP1(filaActual, j, Color.VIOLETA, tablero));
-            	  break;
-              case 95:
-            	  tablero.agregar_entidad(generador.crearTdP1(filaActual, j, Color.ROSA, tablero));
             	  break;
             }
           }

@@ -6,17 +6,10 @@ import java.util.List;
 
 import entidades.*;
 
-/**
- * Modela el tablero de la aplicación. Mantiene control sobre las entidades, y provee acceso a
- * ellas. Se responsabiliza de desencadenar intercambios entre entidades y 
- * retrotraerlos cuando no provocan matchs.
- * 
- */
 public class Tablero {
 
 	protected Juego mi_juego;
 	protected Entidad[][] entidades;
-	protected Gelatina[][] gelatinas;
 	protected ManagerObjetivos manager_objetivos;
 	
 	protected List<Entidad> entidades_asociadas;
@@ -27,8 +20,6 @@ public class Tablero {
 	protected int pos_f_jugador;
 	protected int pos_c_jugador;
 	
-	protected int regla_de_match;
-
 	public Tablero(Juego j) {
 		mi_juego = j;
 		filas = 0;
@@ -47,10 +38,6 @@ public class Tablero {
 		return entidades[f][c];
 	}
 	
-	public Gelatina get_gelatina(int f, int c) {
-		return gelatinas[f][c];
-	}
-	
 	public void resetar_tablero(int f, int c) {
 		filas = f;
 		columnas = c;
@@ -60,20 +47,10 @@ public class Tablero {
 		entidades_asociadas = new LinkedList<Entidad>();
 	}
 	
-	public void resetar_gelatinas(int f, int c) {
-		filas = f;
-		columnas = c;
-		gelatinas = new Gelatina[f][c];
-	}
-
 	public void agregar_entidad(Entidad e) {
 		entidades[e.get_fila()][e.get_columna()] = e;
 	}
 	
-	public void agregar_asociada(Gelatina g) {
-		gelatinas[g.get_fila()][g.get_columna()] = g;
-	}
-
 	public void fijar_jugador(int f, int c) {
 		entidades[f][c].enfocar();
 		entidades[pos_f_jugador][pos_c_jugador].desenfocar();
@@ -169,23 +146,10 @@ public class Tablero {
 				if(eliminar.size() >= 3 | eliminar_2.size() >= 3 | detona_con_swap) {
 					procesar_eliminacion(eliminar, movimiento_vertical);
 					procesar_eliminacion(eliminar_2, movimiento_vertical);
+					aplicar_intercambio(nf, nc, pos_f_anterior, pos_c_anterior);
+					nf = pos_f_jugador;
+				    nc = pos_c_jugador;
 					
-					if(regla_de_match == 1 && eliminar.size() >= 5) {
-						aplicar_intercambio(nf, nc, pos_f_anterior, pos_c_anterior);
-						nf = pos_f_jugador;
-				        nc = pos_c_jugador;
-					}
-					if(regla_de_match == 2 && eliminar.size() == 4){
-						aplicar_intercambio(nf, nc, pos_f_anterior, pos_c_anterior);
-						nf = pos_f_jugador;
-				        nc = pos_c_jugador;
-					}
-					if(regla_de_match == 3 && eliminar.size() >= 4){
-						aplicar_intercambio(nf, nc, pos_f_anterior, pos_c_anterior);
-						nf = pos_f_jugador;
-				        nc = pos_c_jugador;
-					}
-	
 			        // Bucle refill
 			        boolean hay_nuevos_match = true;
 			        while(hay_nuevos_match) {
@@ -219,42 +183,15 @@ public class Tablero {
 	}
 	
 	private void procesar_eliminacion(List<Entidad> eliminar, boolean movimiento_vertical) {
-		if(regla_de_match == 0) {
-			if(eliminar.size() == 2) 
-				for(Entidad e : eliminar) 
-					e.detonar();
-			else if(eliminar.size() == 3) 
-				match_simple(eliminar);
-		  	else if(eliminar.size() == 4)
-		  			match_cuatro(eliminar, movimiento_vertical);
-		  		else
-		  			match_multiple(eliminar);
-		}
-		else if(regla_de_match == 1) {
-			if(eliminar.size() == 2) 
-				for(Entidad e : eliminar) 
-					e.detonar();
-			else if(eliminar.size() == 3) 
-				match_simple(eliminar);
-		  	else if(eliminar.size() == 4)
-		  			match_cuatro(eliminar, movimiento_vertical);
-		}
-		else if(regla_de_match == 2) {
-			if(eliminar.size() == 2) 
-				for(Entidad e : eliminar) 
-					e.detonar();
-			else if(eliminar.size() == 3) 
-				match_simple(eliminar);
-		  	else if(eliminar.size() >= 5)
-		  		match_multiple(eliminar);
-		}
-		else if(regla_de_match == 3) {
-			if(eliminar.size() == 2) 
-				for(Entidad e : eliminar) 
-					e.detonar();
-			else if(eliminar.size() == 3) 
-				match_simple(eliminar);
-		}
+		if(eliminar.size() == 2) 
+			for(Entidad e : eliminar) 
+				e.detonar();
+		else if(eliminar.size() == 3) 
+			match_simple(eliminar);
+	  	else if(eliminar.size() == 4)
+  			match_cuatro(eliminar, movimiento_vertical);
+		else
+  			match_multiple(eliminar);
 	}
 	
 	private void verificar_glaseados(List<Entidad> eliminar) {
@@ -339,14 +276,8 @@ public class Tablero {
 		    
 		    //Notificar entidad destruida
 		    List<Objetivo> lista_objetivos = new ArrayList<Objetivo> (manager_objetivos.get_lista());
-		    //Chequeo de gelatinas
-			if(gelatinas[entidad_a_cambiar.get_fila()][entidad_a_cambiar.get_columna()] != null) {
-				//Notificar entidad destruida
-				actualizar_objetivos(lista_objetivos, gelatinas[entidad_a_cambiar.get_fila()][entidad_a_cambiar.get_columna()]);
-				gelatinas[entidad_a_cambiar.get_fila()][entidad_a_cambiar.get_columna()].detonar();
-			}
-			
-		    entidad_a_cambiar.detonar();
+
+			entidad_a_cambiar.detonar();
 		    actualizar_objetivos(lista_objetivos, entidad_a_cambiar);
 		    eliminar.remove(entidad_a_cambiar);
 		    
@@ -374,12 +305,6 @@ public class Tablero {
 	private void detonacion_y_creacion(List<Entidad> eliminar) {
 		List<Objetivo> lista_objetivos = new ArrayList<Objetivo> (manager_objetivos.get_lista());
 		for(Entidad e : eliminar){
-			if(gelatinas[e.get_fila()][e.get_columna()] != null) {
-				//Notificar entidad destruida
-				actualizar_objetivos(lista_objetivos, gelatinas[e.get_fila()][e.get_columna()]);
-				gelatinas[e.get_fila()][e.get_columna()].detonar();
-				gelatinas[e.get_fila()][e.get_columna()] = null;
-			}
 	    	//Notificar entidad destruida
 			actualizar_objetivos(lista_objetivos, e);
 			e.detonar();
@@ -472,89 +397,6 @@ public class Tablero {
 		match_simple(eliminar);
 	}
 	
-	public void detonar(Glaseado potenciador) {
-		List<Entidad> eliminar = new ArrayList<>();
-		int columna = potenciador.get_columna();
-		potenciador.detonar_especial();
-		boolean hay_entidad_sin_gravedad_arriba = false;
-		
-		for(int f = potenciador.get_fila(); f >= 0 && !hay_entidad_sin_gravedad_arriba; f--)
-			if((!entidades[f][columna].tiene_gravedad()) && entidades[f][columna] != potenciador) 
-				hay_entidad_sin_gravedad_arriba = true;
-				
-		if(!hay_entidad_sin_gravedad_arriba) {
-			for(int fila = 0; fila < filas; fila++)
-				if(entidades[fila][columna].get_detonada()) 
-					eliminar.add(entidades[fila][columna]);
-	
-			int fila_aux = -1;
-			for(Entidad e : eliminar) {
-				if(entidades[e.get_fila()][e.get_columna()].get_detonada()) {
-					subir_vacio(e.get_fila(), e.get_columna());
-					Entidad nuevo_caramelo;
-					nuevo_caramelo = new Caramelo(e.get_fila(), e.get_columna(), Color.color_random(), "/imagenes/caramelos/"+mi_juego.getGenerador().toString()+"-", this);
-					agregar_entidad(nuevo_caramelo);
-					mi_juego.asociar_entidad_logica_grafica_nueva(nuevo_caramelo, fila_aux);
-					nuevo_caramelo.caer(e.get_fila(), e.get_columna());
-					fila_aux--;
-				}
-			}
-		}
-	}
-	
-	public void detonar(TdP1 potenciador) {
-		List<Entidad> eliminar = new ArrayList<>();
-		int fila_pot = potenciador.get_fila();
-		int columna_pot = potenciador.get_columna();
-		potenciador.detonar_especial();
-		Entidad nuevo_caramelo;
-        nuevo_caramelo = new Caramelo(fila_pot, columna_pot, Color.color_random(), "/imagenes/caramelos/" + mi_juego.getGenerador().toString() + "-", this);
-        agregar_entidad(nuevo_caramelo);
-        mi_juego.asociar_entidad_logica_grafica_nueva(nuevo_caramelo, -1);
-        nuevo_caramelo.caer(fila_pot, columna_pot);
-        eliminar.add(nuevo_caramelo);
-		
-		for(int fila = 0; fila < filas; fila++)
-			if((!entidades[fila][columna_pot].get_detonada()) && entidades[fila][columna_pot] != potenciador) 
-				eliminar.add(entidades[fila][columna_pot]);
-		
-		for(int columna = 0; columna < columnas; columna++)
-			if((!entidades[fila_pot][columna].get_detonada()) && entidades[fila_pot][columna] != potenciador) 
-				eliminar.add(entidades[fila_pot][columna]);
-		
-		detonacion_y_creacion(eliminar);
-	}
-	
-	public void detonar(TdP2 potenciador) {
-		List<Entidad> eliminar = new ArrayList<>();
-		int columna = potenciador.get_columna();
-		potenciador.detonar_especial();
-		boolean hay_entidad_sin_gravedad_arriba = false;
-		
-		for(int f = potenciador.get_fila(); f >= 0 && !hay_entidad_sin_gravedad_arriba; f--)
-			if((!entidades[f][columna].tiene_gravedad()) && entidades[f][columna] != potenciador) 
-				hay_entidad_sin_gravedad_arriba = true;
-				
-		if(!hay_entidad_sin_gravedad_arriba) {
-			for(int fila = 0; fila < filas; fila++)
-				if(entidades[fila][columna].get_detonada()) 
-					eliminar.add(entidades[fila][columna]);
-	
-			int fila_aux = -1;
-			for(Entidad e : eliminar) {
-				if(entidades[e.get_fila()][e.get_columna()].get_detonada()) {
-					subir_vacio(e.get_fila(), e.get_columna());
-					Entidad nuevo_caramelo;
-					nuevo_caramelo = new Caramelo(e.get_fila(), e.get_columna(), Color.color_random(), "/imagenes/caramelos/"+mi_juego.getGenerador().toString()+"-", this);
-					agregar_entidad(nuevo_caramelo);
-					mi_juego.asociar_entidad_logica_grafica_nueva(nuevo_caramelo, fila_aux);
-					nuevo_caramelo.caer(e.get_fila(), e.get_columna());
-					fila_aux--;
-				}
-			}
-		}
-	}
-	
 	private void actualizar_objetivos(List<Objetivo> lista_objetivos, Entidad e) {
 		int posicion = 0;
 		boolean no_repetir = true;
@@ -570,27 +412,8 @@ public class Tablero {
 		}
 	}
 	
-	private void actualizar_objetivos(List<Objetivo> lista_objetivos, Gelatina g) {
-		int posicion = 0;
-		boolean no_repetir = true;
-		for(Objetivo objetivo : lista_objetivos) {
-			objetivo.chequear_objetivo(g);
-			if (objetivo.get_cantidad() == 0 && no_repetir) {
-				no_repetir = false;
-				mi_juego.notificar_desuscripcion(posicion);
-				manager_objetivos.desuscribirse(objetivo);
-				mi_juego.chequeo_nivel();
-			}
-			posicion++;
-		}
-	}
-	
 	public void notificar_perder() {
 		mi_juego.notificar_perder();
-	}
-	
-	public void notificar_existencia(TdP2 tdp2) {
-		mi_juego.notificar_existencia(tdp2);
 	}
 	
 	public void notificar_sumar_puntaje(int puntaje_a_sumar) {
@@ -709,10 +532,6 @@ public class Tablero {
 
 	public void actualizar_manager_objetivos(ManagerObjetivos manager) {
 		manager_objetivos = manager;
-	}
-
-	public void notificar_regla_match(int i) {
-		regla_de_match = i;
 	}
 
 }

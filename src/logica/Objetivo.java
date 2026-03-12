@@ -3,12 +3,8 @@ package logica;
 import entidades.Caramelo;
 import entidades.Entidad;
 import entidades.Envuelto;
-import entidades.Gelatina;
-import entidades.Glaseado;
 import entidades.RayadoHorizontal;
 import entidades.RayadoVertical;
-import entidades.TdP1;
-import entidades.TdP2;
 
 public class Objetivo {
 	protected int cantidad;
@@ -42,25 +38,6 @@ public class Objetivo {
 			}
 	}
 		
-	public void chequear_objetivo(Glaseado g){
-		if (g.get_image_path().equals(img_path))
-			if (cantidad > 0)
-					cantidad--;
-	}
-	
-	public void chequear_objetivo(Gelatina gel){
-		if (gel.get_image_path().equals(img_path)) 
-			if (cantidad > 0) {
-					cantidad--;
-			}
-	}
-	
-	public void chequear_objetivo(TdP1 t) {
-	}
-	
-	public void chequear_objetivo(TdP2 t) {
-	}
-	
 	public void chequear_objetivo(RayadoVertical t) {
 	}
 	

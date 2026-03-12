@@ -40,7 +40,6 @@ import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
 import entidades.Potenciador;
-import entidades.TdP2;
 import factories.AbstractFactory;
 import factories.KirbyFactory;
 import factories.ZeldaFactory;
@@ -52,11 +51,6 @@ import logica.Puntaje;
 import logica.TopJugadores;
 import manejadorAnimaciones.CentralAnimaciones;
 
-/**
- * Modela el comportamiento de la Ventana de la aplicación.
- * Ofrece servicios para comunicar los diferentes elementos que conforman la gráfica de la aplicación con la lógica de la misma.
- *
- */
 public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificable, Puntaje {
 	
 	protected Juego mi_juego;
@@ -104,20 +98,12 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	
 	protected JButton botonRanking;
 	
-	private List<TdP2> entidadesTDP2;
-	
-	/**
-	 * Inicializa la ventana asociada al juego en progreso, considerando
-	 * @param j El juego que controlará la lógica de la aplicación, y con quien comunicará los movimientos del jugador.
-	 */
 	public Ventana(Juego j) {
 		mi_juego = j;
 		mi_animador = new CentralAnimaciones(this);
 		
 		animaciones_pendientes = 0;
 		bloquear_intercambios = false;
-		
-		entidadesTDP2 = new ArrayList<>();
 		
 		inicializar();
 	}
@@ -126,12 +112,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		return Generador;
 	}
 	
-	/**
-	 * Crea una nueva celda, que quedará asociada a la entidad lógica parametrizada, a partir de la ubicación de esta.
-	 * Agrega y deja visible la celda creada, por sobre la pantalla.
-	 * @param e Entidad lógica con la que quedará asociada la celda.
-	 * @return La entidad gráfica creada.
-	 */
 	public EntidadGrafica agregar_entidad(EntidadLogica e) {
 		Celda celda = new Celda(this, e, size_label);
 		panel_principal.add(celda, 0);
@@ -155,7 +135,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		return celda;
 	}
 	
-	@Override
 	public void notificarse_animacion_en_progreso() {
 		synchronized(this){
 			animaciones_pendientes ++;
@@ -163,7 +142,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		}
 	}
 	
-	@Override
 	public void notificarse_animacion_finalizada() {
 		synchronized(this){
 			animaciones_pendientes --;
@@ -171,32 +149,26 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		}
 	}
 	
-	@Override
 	public void animar_movimiento(Celda c) {
 	    mi_animador.animar_intercambio(c);
 	}
 
-	@Override
 	public void animar_cambio_estado(Celda c) {
 	    mi_animador.animar_cambio_foco(c);
 	}
 
-	@Override
 	public void animar_detonacion(Celda c) {
 	    mi_animador.animar_detonacion(c);
 	}
 	
-	@Override
 	public void animar_caida(Celda celda) {
 		mi_animador.animar_caida(celda);
 	}
 	
-	@Override
 	public void animar_creacion_con_delay(Celda celda) {
 		mi_animador.animar_creacion_con_delay(celda);
 	}
 	
-	@Override
 	public void eliminar_celda(Celda celda) {
 		panel_principal.remove(celda);
 		panel_principal.repaint();
@@ -206,9 +178,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	protected void inicializar() {
 		
 		panel_principal = new JLayeredPane();
-	    //Pantalla para elegir skin
-	
-		 timerglobal = new Timer(10000, comboBox);
+		timerglobal = new Timer(10000, comboBox);
 		
 		//Crea el frame donde se contendra el panel inicial
 		JFrame framePanelElegir = new JFrame("Kirby & Zelda Crush");
@@ -317,11 +287,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		botonRanking.addActionListener(new ActionListener() {
 		    public void actionPerformed (ActionEvent e) {
 		    	
-		    	if(!entidadesTDP2.isEmpty())
-			    	for(TdP2 entidad : entidadesTDP2)
-			    		if(entidad.get_timer() != null) 
-			    			entidad.get_timer().stop();
-		    	
 		    	if (timerglobal != null) timerglobal.stop();
 		        tablaPuntajes();
 		        dialogTablaRanking.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -329,11 +294,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		        panel_principal.requestFocusInWindow();
 		        if (timerglobal != null) timerglobal.start();
 		        
-		        if(!entidadesTDP2.isEmpty())
-			        for(TdP2 entidad : entidadesTDP2)
-			        	if(entidad.get_timer() != null) 
-			        		entidad.get_timer().start();
-
 		    }
 		});
 
@@ -383,10 +343,9 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		    public void actionPerformed (ActionEvent e) {
 		    	frameDeNiveles.setVisible(false);
 		    	panelNivel();
-		    	for(TdP2 entidad : entidadesTDP2)
-		    		entidad.iniciarTemporizador();
 		    }
 		});
+
 		panel_principal.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {	
 				switch(e.getKeyCode()) {
@@ -490,9 +449,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	                public void actionPerformed (ActionEvent e) {
 	                    perderVida(); // Actualiza la visibilidad de las vidas
 	                    
-	                    //reiniciar contadores tdp2
-	                    entidadesTDP2.clear();
-
 	                    if (quedanVidas) {
 	                        limpiarEntidades();
 	                        mi_juego.reiniciarNivel();
@@ -552,10 +508,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	
 	public void ganarNivel() {
 		
-		if(!entidadesTDP2.isEmpty())
-	    	for(TdP2 entidad : entidadesTDP2)
-    			if (entidad.get_timer() != null) entidad.get_timer().stop();
-		
 	    // Deshabilita cualquier interacción con el juego mientras se muestra la etiqueta de "victoria"
 	    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 	        @Override
@@ -601,9 +553,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		            		botonNivel2.addActionListener(new ActionListener() {
 		            		    public void actionPerformed (ActionEvent e) {
 		            		    	
-		            		    	//reiniciar contadores tdp2
-		    	                    entidadesTDP2.clear();
-		            		    	
 		            		    	frameDeNiveles.setVisible(false);
 		            		    	setSize(700, 700);
 		            		    	Icon fondoNiveles = new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"FondoNiveles.png"));
@@ -631,9 +580,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		            		botonNivel3.addActionListener(new ActionListener() {
 		            		    public void actionPerformed (ActionEvent e) {
 		            		    	
-		            		    	//reiniciar contadores tdp2
-		    	                    entidadesTDP2.clear();
-		            		    	
 		            		    	frameDeNiveles.setVisible(false);
 		            		    	resetPantallaNivel();
 		            		    	victoria.setBounds(panel_principal.getWidth() / 2 - 150, panel_principal.getHeight() / 2 - 150, 300, 300);
@@ -658,9 +604,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	                		levelUp.setVisible(false);
 		            		botonNivel4.addActionListener(new ActionListener() {
 		            		    public void actionPerformed (ActionEvent e) {
-		            		    	
-		            		    	//reiniciar contadores tdp2
-		    	                    entidadesTDP2.clear();
 		            		    	
 		            		    	frameDeNiveles.setVisible(false);
 		            		    	setSize(700, 700);
@@ -721,9 +664,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	                		if(timerglobal != null && timerglobal.isRunning()) timerglobal.stop();
 		            		botonNivel5.addActionListener(new ActionListener() {
 		            		    public void actionPerformed (ActionEvent e) {
-		            		    	
-		            		    	//reiniciar contadores tdp2
-		    	                    entidadesTDP2.clear();
 		            		    	
 		            		    	frameDeNiveles.setVisible(false);
 		            		    	setSize(700, 700);
@@ -948,7 +888,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	}
 	
 	protected void cargar_objetivos() {
-		mi_juego.notificar_regla_match();
 		contadores = new ArrayList<JLabel>();
 		objetivos = mi_juego.actualizar_manager_objetivos();
 		JLabel contador_aux;
@@ -1002,10 +941,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 
 	public void notificar_perder() {
 		mostrarGameOver();
-	}
-
-	public void notificar_existencia(TdP2 tdp2) {
-		entidadesTDP2.add(tdp2);
 	}
 
 	public void notificar_desuscripcion(int posicion) {

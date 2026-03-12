@@ -15,13 +15,6 @@ AmarillosFaltantes: 2
 # Tiempo límite en segundos
 Tiempo: 0
 
-# Reglas de matchs:
-# 0 : Vale todo (Regla Match 3 + Regla Match 4 + Regla Match L, +, T)
-# 1 : Regla Match 3 + Regla Match 4 
-# 2 : Regla Match 3 + Regla Match L, +, T
-# 3 : Regla Match 3 
-ReglaDeMatch: 0
-
 # Definición del tablero
 Tablero: (crear)
 71 74 72 74 1 2 3 
