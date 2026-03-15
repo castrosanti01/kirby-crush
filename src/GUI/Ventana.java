@@ -25,7 +25,6 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -72,7 +71,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	protected JLayeredPane panelJuego;
 	
 	// ===================== COMPONENTES DE NAVEGACIÓN =====================
-	private JComboBox<AbstractFactory> comboBox;
+	private JButton botonKirby, botonZelda;
 	private JButton botonNivel1, botonNivel2, botonNivel3, botonNivel4, botonNivel5;
 	protected JButton botonRanking;
 	
@@ -147,6 +146,11 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		
 		cardLayout.show(mainPanel, "seleccionTema");
 
+		//Ranking
+		dialogTablaRanking = new JDialog(Ventana.this, "RANKING - Top 5", true);
+		dialogTablaRanking.setIconImage(new ImageIcon(this.getClass().getResource("/imagenes/icono/kirbyicon.png")).getImage());
+		deserializacionRanking();
+
 		//Movimientos con teclado
         panelJuego.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {	
@@ -172,26 +176,40 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		fondo.setBounds(0, 0, WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
 		panel.add(fondo, 0);
 		
-		AbstractFactory[] factories = new AbstractFactory[2];
-		factories[0] = new KirbyFactory();
-		factories[1] = new ZeldaFactory();
-		comboBox = new JComboBox<AbstractFactory>(factories);
-		comboBox.setBounds(285, 537, 132, 40);
-		panel.add(comboBox, 0);
+		botonKirby = new JButton();
+		Icon iconKirby = cargarIcono("/imagenes/niveles/kirby/BotonKirby.png");
+		botonKirby.setIcon(iconKirby);
+		botonKirby.setBounds(100, 550, 130, 40);
+		botonKirby.setOpaque(false);
+		botonKirby.setContentAreaFilled(false);
+		panel.add(botonKirby, 0);
 		
-		comboBox.addActionListener(new ActionListener() {
+		botonKirby.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Generador = (AbstractFactory)comboBox.getSelectedItem();
+				Generador = new KirbyFactory();
 				mi_juego.setGenerador(Generador);
 				setTitle(Generador.toString() + " Crush");
 				
 				prepararPanelSeleccionNiveles();
+				cardLayout.show(mainPanel, "seleccionNiveles");
+			}
+		});
+		
+		botonZelda = new JButton();
+		Icon iconZelda = cargarIcono("/imagenes/niveles/zelda/BotonZelda.png");
+		botonZelda.setIcon(iconZelda);
+		botonZelda.setBounds(465, 550, 130, 40);
+		botonZelda.setOpaque(false);
+		botonZelda.setContentAreaFilled(false);
+		panel.add(botonZelda, 0);
+		
+		botonZelda.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Generador = new ZeldaFactory();
+				mi_juego.setGenerador(Generador);
+				setTitle(Generador.toString() + " Crush");
 				
-				dialogTablaRanking = new JDialog(Ventana.this, "RANKING - Top 5", true);
-				dialogTablaRanking.setIconImage(new ImageIcon(this.getClass().getResource("/imagenes/icono/"+Generador.toString()+"icon.png")).getImage());
-				
-				deserializacionRanking();
-				
+				prepararPanelSeleccionNiveles();
 				cardLayout.show(mainPanel, "seleccionNiveles");
 			}
 		});
