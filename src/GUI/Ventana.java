@@ -2,7 +2,6 @@ package GUI;
 
 import java.awt.CardLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,12 +67,14 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	private JLayeredPane panelSeleccionTema;
 	private JLayeredPane panelSeleccionNiveles;
 	private JLayeredPane panelFinal;
-	protected JLayeredPane panelJuego;
+	private JLayeredPane panelJuego;
+	private JDialog dialogTablaRanking;
+	private DefaultTableModel tablaRanking;
 	
 	// ===================== COMPONENTES DE NAVEGACIÓN =====================
 	private JButton botonKirby, botonZelda;
 	private JButton botonNivel1, botonNivel2, botonNivel3, botonNivel4, botonNivel5;
-	protected JButton botonRanking;
+	private JButton botonRanking;
 	
 	// ===================== COMPONENTES DE VIDAS =====================
 	private JLabel vida1, vida2, vida3;
@@ -84,33 +85,13 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	public JLabel contadorTiempo;
 	public JLabel contadorPuntaje;
 	private List<JLabel> contadores;
-	protected List<Objetivo> objetivos;
-	
-	// ===================== COMPONENTES NO USADOS (LEGACY) =====================
-	public JLabel contadorVerdes;
-	public JLabel contadorAmarillos;
-	public JLabel contadorAzules;
-	public JLabel contadorVioletas;
-	public JLabel contadorRosas;
-	public JLabel contadorGelatina;
-	public JLabel contadorGlaseados;
-	public JLabel objetivo;
-	protected JLabel texto_superior;
+	private List<Objetivo> objetivos;
 	
 	// ===================== ANIMACIONES Y TIMERS =====================
-	protected int animaciones_pendientes;
-	protected boolean bloquear_intercambios;
+	private int animaciones_pendientes;
+	private boolean bloquear_intercambios;
 	private Timer timerglobal;
-	
-	// ===================== DIÁLOGOS Y FRAMES SECUNDARIOS =====================
-	protected JTextField nombreTextField;
-	protected JFrame frameNombreJugador;
-	protected JDialog dialogTablaRanking;
-	protected JFrame frameTablaRanking;
-	protected DefaultTableModel tablaRanking;
-	protected JFrame frameDeNiveles;
-	
-	private JPanel panelNombreJugador;
+
 	
 	// ===================== CONFIGURACIÓN VENTANA =====================
 	public Ventana(Juego j) {
@@ -135,13 +116,11 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		panelSeleccionTema = crearPanelSeleccionTema();
 		panelSeleccionNiveles = new JLayeredPane();
 		panelJuego = new JLayeredPane();
-		panelNombreJugador = new JPanel();
 		panelFinal = new JLayeredPane();
 		
 		mainPanel.add(panelSeleccionTema, "seleccionTema");
 		mainPanel.add(panelSeleccionNiveles, "seleccionNiveles");
 		mainPanel.add(panelJuego, "juego");
-		mainPanel.add(panelNombreJugador, "nombreJugador");
 		mainPanel.add(panelFinal, "final");
 		
 		cardLayout.show(mainPanel, "seleccionTema");
@@ -247,16 +226,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		agregarBotonesNiveles();
 	}
 	
-	private void mostrarRanking() {
-		if (timerglobal != null) 
-			timerglobal.stop();
-        tablaPuntajes();
-        dialogTablaRanking.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialogTablaRanking.setVisible(true);
-        panelJuego.requestFocusInWindow();
-        if (timerglobal != null) 
-			timerglobal.start();
-	}
 
 	private void agregarBotonesNiveles() {
 		botonNivel1 = crearBotonNivel(Generador.toString()+"/BotonNivel1.png", 200, 180, 100, 100);
@@ -323,6 +292,42 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		panelJuego.repaint();
 		panelJuego.requestFocusInWindow();
 	}		
+
+	private void cargar_objetivos() {
+		contadores = new ArrayList<JLabel>();
+		objetivos = mi_juego.actualizar_manager_objetivos();
+		JLabel contador_aux;
+		int filaAux = 96;
+		
+		for(Objetivo obejetivo : objetivos) {
+			if(obejetivo.get_image_path()!= null) {
+				contador_aux = new JLabel(String.valueOf(obejetivo.get_cantidad()));
+	    		contador_aux.setFont(new Font("MONOSPACED", Font.BOLD, 58));
+	    		contador_aux.setBounds(625, filaAux-5, 110, 70);
+	    		panelJuego.add(contador_aux, 0);
+	    		contadores.add(contador_aux);
+	    		
+	    		JLabel carameloGeneral = new JLabel();
+	    		carameloGeneral.setIcon(new ImageIcon(this.getClass().getResource(obejetivo.get_image_path())));
+	    		carameloGeneral.setBounds(550, filaAux, 60, 60);
+	    		panelJuego.add(carameloGeneral, 0);
+	    		
+	    		filaAux = filaAux + 60;
+			}
+		}
+	}
+	
+	public void actualizar_objetivos(List<Objetivo> lista) {
+		int aux = 0;
+		if (contadores.size() > 0)
+		for(Objetivo objetivo : lista){
+			if(objetivo.get_cantidad() == 0)
+				contadores.remove(aux);
+			else
+				contadores.get(aux).setText(String.valueOf(objetivo.get_cantidad()));
+			aux++;
+		}
+	}
 
 	// ===================== GANAR NIVEL =====================
 	public void ganarNivel() {
@@ -398,7 +403,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	}
 
 	// ===================== GAME OVER =====================
-	public void mostrarGameOver() {
+	private void mostrarGameOver() {
 	    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 	        @Override
 	        protected Void doInBackground() {
@@ -445,7 +450,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	                    else {                     
 	                        cardLayout.show(mainPanel, "seleccionNiveles");
 	                        bloquearTodosLosNiveles();
-	                        //panelSetNombreJugador();
+	                        setNombreJugador();
 	                    }
 	                }
 	            });
@@ -459,7 +464,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	                    else {                     
 	                        cardLayout.show(mainPanel, "seleccionNiveles");
 	                        bloquearTodosLosNiveles();
-	                        //panelSetNombreJugador();
+	                        setNombreJugador();
 	                    }
 	    		    }
 	    		});
@@ -469,7 +474,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	    worker.execute();
 	}	
 	
-	protected void perderVida() {
+	private void perderVida() {
 	    if (vida3.isVisible()) {
 	        vida3.setVisible(false);
 	    } else if (vida2.isVisible()) {
@@ -480,104 +485,148 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	    }
 	}
 	
-	public void limpiarEntidades() {
+	private void limpiarEntidades() {
 	    panelJuego.removeAll();
 	    panelJuego.revalidate();
 	    panelJuego.repaint();
 	}
 
-	// ===================== PANEL NOMBRE JUGADOR =====================
-	public void panelSetNombreJugador() {
-	    // Crear el JFrame
-	    frameNombreJugador.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    frameNombreJugador.setSize(300, 105);
-	    frameNombreJugador.setLocationRelativeTo(null);
-	    frameNombreJugador.setLayout(new BoxLayout(frameNombreJugador.getContentPane(), BoxLayout.Y_AXIS));
-
-	    // Configuración del panel para ingresar el nombre
-	    JPanel panelNombre = new JPanel();
-	    panelNombre.setLayout(new BoxLayout(panelNombre, BoxLayout.Y_AXIS));
-
-	    JLabel etiquetaNombre = new JLabel("Fin de la Partida. Ingrese nombre de jugador:");
-	    etiquetaNombre.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-	    nombreTextField = new JTextField();
-	    nombreTextField.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-	    JButton botonAceptar = new JButton("Aceptar");
-	    botonAceptar.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-	    panelNombre.add(etiquetaNombre);
-	    panelNombre.add(nombreTextField);
-	    panelNombre.add(botonAceptar);
-	    frameNombreJugador.add(panelNombre);
-	    frameNombreJugador.setVisible(true);
-
-	    botonAceptar.addActionListener(new ActionListener() {
-	        @Override
-	        public void actionPerformed(ActionEvent e) {
-	            String nombre = nombreTextField.getText();
-	            if (nombre != null && !nombre.isEmpty()) {
-	            	mi_juego.get_jugador_actual().set_nombre(nombre);
-	            	mi_juego.getTopJugadores().agregar_jugador(mi_juego.get_jugador_actual());
-	                frameNombreJugador.setVisible(false);     
-	                frameNombreJugador.dispose(); 
-	                tablaPuntajes();			        
-	                serializacionRanking();
-	                dialogTablaRanking.setVisible(true);            
-	            } else {
-	                JOptionPane.showMessageDialog(null, "Por favor, ingrese nombre de jugador.");
-	            }
-	        }
-	    });
+	private void bloquearNivelesAnteriores() {
+		switch(mi_juego.nivelActual()) {
+			case 4:
+				botonNivel4.setEnabled(false);
+			case 3:
+				botonNivel3.setEnabled(false);
+			case 2:
+				botonNivel2.setEnabled(false);
+			case 1:
+				botonNivel1.setEnabled(false);
+				break;
+		}
 	}
 	
+	private void bloquearTodosLosNiveles() {
+		botonNivel1.setEnabled(false);
+		botonNivel2.setEnabled(false);
+		botonNivel3.setEnabled(false);
+		botonNivel4.setEnabled(false);
+		botonNivel5.setEnabled(false);
+	}
+
+	// ===================== PANEL FINAL =====================
+	public void terminarJuego() {
+		limpiarEntidades();
+		cardLayout.show(mainPanel, "final");
+
+		JLabel kirbylink = new JLabel();
+		kirbylink.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/PanelFinal.gif")));
+		kirbylink.setBounds(0, 0, 539, 539);
+		panelFinal.add(kirbylink, JLayeredPane.DEFAULT_LAYER);
+		
+		JLabel graciasPorJugar = new JLabel();
+		graciasPorJugar.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/graciasPorJugar.png")));
+		graciasPorJugar.setBounds(170, 200, 300, 90);
+		panelFinal.add(graciasPorJugar, 0);
+		
+		panelFinal.revalidate();
+		panelFinal.repaint();
+		
+		setNombreJugador();
+	}
+
+	// ===================== RANKING =====================
+	private void mostrarRanking() {
+		if (timerglobal != null) 
+			timerglobal.stop();
+        tablaPuntajes();
+        dialogTablaRanking.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialogTablaRanking.setVisible(true);
+        panelJuego.requestFocusInWindow();
+        if (timerglobal != null) 
+			timerglobal.start();
+	}
+
 	public void tablaPuntajes() {
-	    // Configuración del JDialog
 	    dialogTablaRanking.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	    dialogTablaRanking.setSize(300, 150);
 	    dialogTablaRanking.setLocationRelativeTo(null);
 
-	    // Crear el modelo de la tabla
 	    if (tablaRanking == null) {
 	        tablaRanking = new DefaultTableModel();
 	        tablaRanking.addColumn("JUGADOR");
 	        tablaRanking.addColumn("PUNTAJE");
 	    }
 	    
-        // Ordenar la tabla por puntaje de mayor a menor
-        actualizarTabla();
-        
-	    // Crear la tabla con el modelo
-	    JTable tabla = new JTable(tablaRanking);
-	    
-	    // Deshabilitar la edición de celdas en la tabla
-	    tabla.setDefaultEditor(Object.class, null);
-
-	    // Deshabilitar el reordenamiento de columnas
-	    tabla.getTableHeader().setReorderingAllowed(false);
-        
-	    // Agregar la tabla a un JScrollPane
-	    JScrollPane scrollPane = new JScrollPane(tabla);
-
-	    // Agregar el JScrollPane al JDialog
-	    dialogTablaRanking.add(scrollPane);
-	    
-	}
-
-    public void actualizarTabla() {
-        // Obtener la lista de jugadores desde TopJugadores
+		//Actualizar la tabla
         List<Jugador> jugadores = mi_juego.getTopJugadores().get_ranking_ordenado();
-
-        // Limpiar el modelo de la tabla
         tablaRanking.setRowCount(0);
-
-        // Llenar el modelo de la tabla con los datos de los jugadores
+		
         for (Jugador jugador : jugadores) {
             tablaRanking.addRow(new Object[]{jugador.get_jugador(), jugador.get_puntaje_acumulado()});
         }
-    }
-    
+        
+	    JTable tabla = new JTable(tablaRanking);
+	    tabla.setDefaultEditor(Object.class, null);
+	    tabla.getTableHeader().setReorderingAllowed(false);
+	    JScrollPane scrollPane = new JScrollPane(tabla);
+	    dialogTablaRanking.add(scrollPane);
+	}
+	
+	public void setNombreJugador() {
+		JDialog frameNombreJugador = new JDialog(Ventana.this, "Jugador", true);
+	    frameNombreJugador.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	    frameNombreJugador.setSize(350, 180);
+	    frameNombreJugador.setLocationRelativeTo(null);
+	    frameNombreJugador.setResizable(false);
+	    frameNombreJugador.setLayout(new BoxLayout(frameNombreJugador.getContentPane(), BoxLayout.Y_AXIS));
+		frameNombreJugador.setIconImage(new ImageIcon(this.getClass().getResource("/imagenes/icono/kirbyicon.png")).getImage());
+
+	    JPanel panelNombre = new JPanel();
+	    panelNombre.setLayout(new BoxLayout(panelNombre, BoxLayout.Y_AXIS));
+	    panelNombre.setBorder(javax.swing.BorderFactory.createEmptyBorder(15, 20, 15, 20));
+
+	    JLabel etiquetaNombre = new JLabel("Fin de la partida, ingrese su nombre:");
+	    etiquetaNombre.setAlignmentX(Component.CENTER_ALIGNMENT);
+	    etiquetaNombre.setFont(new Font("Arial", Font.BOLD, 12));
+
+	    JTextField nombreTextField = new JTextField(20);
+	    nombreTextField.setAlignmentX(Component.CENTER_ALIGNMENT);
+	    nombreTextField.setMaximumSize(new java.awt.Dimension(250, 30));
+	    nombreTextField.setFont(new Font("Arial", Font.PLAIN, 14));
+
+	    JButton botonAceptar = new JButton("ACEPTAR");
+	    botonAceptar.setAlignmentX(Component.CENTER_ALIGNMENT);
+	    botonAceptar.setMaximumSize(new java.awt.Dimension(100, 40));
+	    botonAceptar.setFont(new Font("Arial", Font.BOLD, 13));
+	    botonAceptar.setFocusPainted(false);
+	    
+	    botonAceptar.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	            String nombre = nombreTextField.getText().trim();
+	            if (nombre != null && !nombre.isEmpty()) {
+	            	mi_juego.get_jugador_actual().set_nombre(nombre);
+	            	mi_juego.getTopJugadores().agregar_jugador(mi_juego.get_jugador_actual());
+	                frameNombreJugador.dispose(); 
+	                tablaPuntajes();			        
+	                serializacionRanking();
+	                dialogTablaRanking.setVisible(true);            
+	            } else {
+	                JOptionPane.showMessageDialog(frameNombreJugador, "Por favor, ingrese nombre de jugador.", "Campo vacío", JOptionPane.WARNING_MESSAGE);
+	            }
+	        }
+	    });
+
+	    panelNombre.add(etiquetaNombre);
+	    panelNombre.add(javax.swing.Box.createVerticalStrut(15));
+	    panelNombre.add(nombreTextField);
+	    panelNombre.add(javax.swing.Box.createVerticalStrut(15));
+	    panelNombre.add(botonAceptar);
+	    frameNombreJugador.add(panelNombre);
+	    frameNombreJugador.setVisible(true);
+	    nombreTextField.requestFocusInWindow();
+	}
+	
 	private void serializacionRanking() {
 		try {
 			FileOutputStream fileOutputStream = new FileOutputStream("./puntaje/ranking.tdp");
@@ -612,90 +661,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		}
 	}
 	
-	public void terminarJuego() {
-		setSize(700, 700);
-		setLocationRelativeTo(null);
-		
-		panelFinal.removeAll();
-		panelFinal.setPreferredSize(new Dimension(700, 700));
-		
-		JLabel kirbylink = new JLabel();
-		kirbylink.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/kirbygiffinal.gif")));
-		kirbylink.setBounds(0, 0, 539, 539);
-		panelFinal.add(kirbylink, JLayeredPane.DEFAULT_LAYER);
-		
-		JLabel graciasPorJugar = new JLabel();
-		graciasPorJugar.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/graciasPorJugar.png")));
-		graciasPorJugar.setBounds(170, 200, 300, 90);
-		panelFinal.add(graciasPorJugar, 0);
-		
-		panelFinal.revalidate();
-		panelFinal.repaint();
-		
-		cardLayout.show(mainPanel, "final");
-		
-		panelSetNombreJugador();
-	}
-
-	public void bloquearNivelesAnteriores() {
-		switch(mi_juego.nivelActual()) {
-			case 4:
-				botonNivel4.setEnabled(false);
-			case 3:
-				botonNivel3.setEnabled(false);
-			case 2:
-				botonNivel2.setEnabled(false);
-			case 1:
-				botonNivel1.setEnabled(false);
-				break;
-		}
-	}
-	
-	public void bloquearTodosLosNiveles() {
-		botonNivel1.setEnabled(false);
-		botonNivel2.setEnabled(false);
-		botonNivel3.setEnabled(false);
-		botonNivel4.setEnabled(false);
-		botonNivel5.setEnabled(false);
-	}
-	
-	protected void cargar_objetivos() {
-		contadores = new ArrayList<JLabel>();
-		objetivos = mi_juego.actualizar_manager_objetivos();
-		JLabel contador_aux;
-		int filaAux = 96;
-		
-		for(Objetivo obejetivo : objetivos) {
-			if(obejetivo.get_image_path()!= null) {
-				contador_aux = new JLabel(String.valueOf(obejetivo.get_cantidad()));
-	    		contador_aux.setFont(new Font("MONOSPACED", Font.BOLD, 58));
-	    		contador_aux.setBounds(625, filaAux-5, 110, 70);
-	    		panelJuego.add(contador_aux, 0);
-	    		contadores.add(contador_aux);
-	    		
-	    		JLabel carameloGeneral = new JLabel();
-	    		carameloGeneral.setIcon(new ImageIcon(this.getClass().getResource(obejetivo.get_image_path())));
-	    		carameloGeneral.setBounds(550, filaAux, 60, 60);
-	    		panelJuego.add(carameloGeneral, 0);
-	    		
-	    		filaAux = filaAux + 60;
-			}
-		}
-		
-	}
-	
-	public void actualizar_objetivos(List<Objetivo> lista) {
-		int aux = 0;
-		if (contadores.size() > 0)
-		for(Objetivo objetivo : lista){
-			if(objetivo.get_cantidad() == 0)
-				contadores.remove(aux);
-			else
-				contadores.get(aux).setText(String.valueOf(objetivo.get_cantidad()));
-			aux++;
-		}
-	}
-
+	// ===================== MUSICA =====================
 	@SuppressWarnings("unused")
 	private void cargarMusica() {
 		try {
@@ -708,31 +674,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 			controlVolumen.setValue(controlVolumen.getValue() - 28.0f);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-	}
-
-	public void notificar_perder() {
-		mostrarGameOver();
-	}
-
-	public void notificar_desuscripcion(int posicion) {
-		if(contadores.size() > posicion) {
-			contadores.get(posicion).setText("0");
-			contadores.remove(posicion);
-		}
-	}
-	
-	public void actualizar_puntaje(int puntaje_a_sumar) {
-		mi_juego.get_jugador_actual().actualizar_puntaje_nivel_actual(puntaje_a_sumar);
-		contadorPuntaje.setText("Puntaje: " + (mi_juego.get_jugador_actual().get_puntaje_acumulado() + mi_juego.get_jugador_actual().get_puntaje_nivel_actual()));
-		
-	}
-	
-	private Icon cargarIcono(String ruta) {
-		try {
-			return new ImageIcon(this.getClass().getResource(ruta));
-		} catch (Exception e) {
-			return null;
 		}
 	}
 
@@ -763,6 +704,36 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		animar_creacion_con_delay(celda);
 		return celda;
 	}
+
+	public void eliminar_celda(Celda celda) {
+		panelJuego.remove(celda);
+		panelJuego.repaint();
+	}
+
+	public void actualizar_puntaje(int puntaje_a_sumar) {
+		mi_juego.get_jugador_actual().actualizar_puntaje_nivel_actual(puntaje_a_sumar);
+		contadorPuntaje.setText("Puntaje: " + (mi_juego.get_jugador_actual().get_puntaje_acumulado() + mi_juego.get_jugador_actual().get_puntaje_nivel_actual()));
+	}
+	
+	private Icon cargarIcono(String ruta) {
+		try {
+			return new ImageIcon(this.getClass().getResource(ruta));
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	// ===================== NOTIFICACIONES =====================
+	public void notificar_perder() {
+		mostrarGameOver();
+	}
+
+	public void notificar_desuscripcion(int posicion) {
+		if(contadores.size() > posicion) {
+			contadores.get(posicion).setText("0");
+			contadores.remove(posicion);
+		}
+	}
 	
 	public void notificarse_animacion_en_progreso() {
 		synchronized(this){
@@ -778,6 +749,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		}
 	}
 	
+	// ===================== ANIMACIONES =====================
 	public void animar_movimiento(Celda c) {
 	    mi_animador.animar_intercambio(c);
 	}
@@ -798,8 +770,4 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		mi_animador.animar_creacion_con_delay(celda);
 	}
 	
-	public void eliminar_celda(Celda celda) {
-		panelJuego.remove(celda);
-		panelJuego.repaint();
-	}
 }

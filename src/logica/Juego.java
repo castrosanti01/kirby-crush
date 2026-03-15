@@ -107,44 +107,8 @@ public class Juego {
 		movimientos--;
 		mi_ventana.contadorMovimientos.setText("Movimientos: " + movimientos);
 		if (movimientos == 0)
-			mi_ventana.mostrarGameOver();
+			mi_ventana.notificar_perder();
 	}
-
-	public void reiniciarNivel() {
-		switch (nivelActual()) {
-			case 1:
-			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/1-nivel.txt"), skin, mi_tablero);
-			break;
-			case 2:
-			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/2-nivel.txt"), skin, mi_tablero);
-			break;
-			case 3:
-			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/3-nivel.txt"), skin, mi_tablero);
-			break;
-			case 4:
-			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/4-nivel.txt"), skin, mi_tablero);
-			break;
-			case 5:
-			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/5-nivel.txt"), skin, mi_tablero);
-			break;
-			default:
-			break;
-		}
-
-		// Actualizar la representación gráfica
-		mi_ventana.limpiarEntidades(); 
-		asociar_entidades_logicas_graficas(); 
-
-		mi_tablero.fijar_jugador(mi_nivel.get_fila_inicial_jugador(), mi_nivel.get_columna_inicial_jugador());
-		set_movimientos();
-		mi_ventana.contadorMovimientos.setText("Movimientos: " + movimientos);
-		vidas--;
-		jugador_actual.resetear_puntaje();
-		mi_ventana.contadorPuntaje.setText("Puntaje: " + jugador_actual.get_puntaje_acumulado());
-		// Repintar la ventana
-		mi_ventana.repaint();
-	}
-
 
 	public void set_movimientos() {
 		movimientos = mi_nivel.get_movimientos();
