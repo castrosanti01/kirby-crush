@@ -200,7 +200,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 
 	// ===================== PANEL DE SELECCIÓN DE NIVELES =====================
 	private void prepararPanelSeleccionNiveles() {
-		Icon imgIcon = cargarIcono("/imagenes/niveles/"+Generador.toString()+"/PanelNivel.jpg");
+		Icon imgIcon = cargarIcono("/imagenes/niveles/"+Generador.toString()+"/PanelSeleccion.jpg");
 		JLabel fondo = new JLabel(imgIcon);
 		fondo.setBounds(0, 0, WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
 		panelSeleccionNiveles.add(fondo, 0);
@@ -217,7 +217,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		panelSeleccionNiveles.add(vida3, 0);
 
 		botonRanking = new JButton();
-		Icon iconRanking = cargarIcono("/imagenes/niveles/"+Generador.toString()+"/Ranking.png");
+		Icon iconRanking = cargarIcono("/imagenes/niveles/"+Generador.toString()+"/BotonRanking.png");
 		botonRanking.setIcon(iconRanking);
         botonRanking.setBounds(260, 575, 180, 70);
         botonRanking.setOpaque(false);
@@ -277,7 +277,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		mi_juego.asociar();
 		mi_juego.set_movimientos();
 		
-		Icon fondoNiveles = new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/FondoNiveles.png"));
+		Icon fondoNiveles = new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/PanelNivel.png"));
 		JLabel labelFondoNiveles = new JLabel(fondoNiveles);
 		labelFondoNiveles.setBounds(0, 0, WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
 		panelJuego.add(labelFondoNiveles, JLayeredPane.DEFAULT_LAYER);
@@ -320,13 +320,13 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 				mi_juego.sumarPuntos();
 
 	            JLabel victoria = new JLabel();
-	            victoria.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/victoria.gif")));
+	            victoria.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/PanelVictoria.gif")));
 	            victoria.setBounds(panelJuego.getWidth() / 2 - 150, panelJuego.getHeight() / 2 - 150, 300, 300);
 	            victoria.setVisible(true);
 	            panelJuego.add(victoria, 0);
 
 	            JButton levelUp = new JButton();
-	            levelUp.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/LevelUp.png")));
+	            levelUp.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/BotonLevelUp.png")));
 	            levelUp.setBounds(panelJuego.getWidth() / 2 - 150, panelJuego.getHeight() / 2 - 150, 300, 300);
 	            levelUp.setOpaque(false);
 	            levelUp.setBorderPainted(false);
@@ -394,16 +394,18 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 
 	        @Override
 	        protected void done() {
-	            JLabel gameOver = new JLabel(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"GameOverPane.png")));
+				perderVida();
+
+	            JLabel gameOver = new JLabel(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/PanelGameOver.png")));
 	            gameOver.setBounds(0, 0, 500, 500);
 	            
-	            JButton retry = new JButton(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"RetryButton.png")));
+	            JButton retry = new JButton(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/BotonRetry.png")));
 	            retry.setBounds(160, 250, 175, 40);
 	            retry.setOpaque(false);
 	            retry.setBorderPainted(false);
 	            retry.setContentAreaFilled(false);
 	            
-	            JButton exit = new JButton(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"ExitButton.png")));
+	            JButton exit = new JButton(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/BotonExit.png")));
 	            exit.setBounds(160, 290, 175, 40);
 	            exit.setOpaque(false);
 	            exit.setBorderPainted(false);
@@ -418,41 +420,38 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	            
 	            retry.addActionListener(new ActionListener() {
 	                public void actionPerformed (ActionEvent e) {
-	                    perderVida();
-	                    
-	                    if (quedanVidas) {
-	                        limpiarEntidades();
-	                        mi_juego.reiniciarNivel();
-	                        gameOver.setVisible(false);
-	                        exit.setVisible(false);
-	                        retry.setVisible(false);
-	                        
-	                        botonRanking.setBounds(480, 28, 180, 70);
-	                        panelJuego.add(botonRanking, 0);
-	                        
-	                        mi_juego.set_movimientos();		    
-	                    } else {                     
+						limpiarEntidades();
+
+	                    if (quedanVidas) 
+	                        iniciarNivel(mi_juego.nivelActual());
+	                    else {                     
 	                        cardLayout.show(mainPanel, "seleccionNiveles");
-	                        limpiarEntidades();
 	                        bloquearTodosLosNiveles();
-	                        gameOver.setVisible(false);
-	                        exit.setVisible(false);
-	                        retry.setVisible(false);
-	                        panelSetNombreJugador();
+	                        //panelSetNombreJugador();
 	                    }
 	                }
 	            });
 	    		
 	    		exit.addActionListener(new ActionListener() {
 	    		    public void actionPerformed (ActionEvent e) {
-	    		    	System.exit(0);
+						limpiarEntidades();
+	    		    	
+						if (quedanVidas) 
+	                        cardLayout.show(mainPanel, "seleccionNiveles");
+	                    else {                     
+	                        cardLayout.show(mainPanel, "seleccionNiveles");
+	                        bloquearTodosLosNiveles();
+	                        //panelSetNombreJugador();
+	                    }
 	    		    }
 	    		});
 	        }
 	    };
 
 	    worker.execute();
-	}	protected void perderVida() {
+	}	
+	
+	protected void perderVida() {
 	    if (vida3.isVisible()) {
 	        vida3.setVisible(false);
 	    } else if (vida2.isVisible()) {
@@ -469,6 +468,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	    panelJuego.repaint();
 	}
 
+	// ===================== PANEL NOMBRE JUGADOR =====================
 	public void panelSetNombreJugador() {
 	    // Crear el JFrame
 	    frameNombreJugador.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -560,8 +560,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
         }
     }
     
-    
-	//Serialización del objeto TopJugadores y escritura en un archivo
 	private void serializacionRanking() {
 		try {
 			FileOutputStream fileOutputStream = new FileOutputStream("./puntaje/ranking.tdp");
@@ -578,7 +576,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		}
 	}
 	
-	//Deserialización del objeto desde el archivo
 	private void deserializacionRanking() {
 		try {
 			FileInputStream fileInputStream = new FileInputStream("./puntaje/ranking.tdp");
