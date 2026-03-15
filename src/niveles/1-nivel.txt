@@ -8,8 +8,8 @@ Columnas: 6
 Movimientos: 100
 
 # Objetivo del nivel
-VerdesFaltantes: 10
-RosasFaltantes: 10
+VerdesFaltantes: 3
+RosasFaltantes: 3
 
 # Tiempo límite en segundos
 Tiempo: 0

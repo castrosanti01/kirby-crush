@@ -63,16 +63,13 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	private static final int WINDOW_WIDTH_GAME = 700;
 	private static final int WINDOW_HEIGHT_GAME = 700;
 	
-	protected int filas;
-	protected int columnas;
-	
 	// ===================== ESTRUCTURA DE PANELES =====================
 	private CardLayout cardLayout;
 	private JPanel mainPanel;
 	private JLayeredPane panelSeleccionTema;
 	private JLayeredPane panelSeleccionNiveles;
 	private JLayeredPane panelFinal;
-	protected JLayeredPane panelPrincipal;
+	protected JLayeredPane panelJuego;
 	
 	// ===================== COMPONENTES DE NAVEGACIÓN =====================
 	private JComboBox<AbstractFactory> comboBox;
@@ -120,6 +117,8 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	public Ventana(Juego j) {
 		mi_juego = j;
 		mi_animador = new CentralAnimaciones(this);
+		cardLayout = new CardLayout();
+		mainPanel = new JPanel(cardLayout);
 		
 		animaciones_pendientes = 0;
 		bloquear_intercambios = false;
@@ -127,38 +126,48 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Kirby & Zelda Crush");
-		setResizable(false);
 		setIconImage(new ImageIcon(this.getClass().getResource("/imagenes/icono/kirbyicon.png")).getImage());
-		
-		cardLayout = new CardLayout();
-		mainPanel = new JPanel(cardLayout);
+		setResizable(false);
+		setSize(WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
+		setLocationRelativeTo(null);
+		setVisible(true);
 		setContentPane(mainPanel);
 		
 		panelSeleccionTema = crearPanelSeleccionTema();
 		panelSeleccionNiveles = new JLayeredPane();
-		panelPrincipal = new JLayeredPane();
+		panelJuego = new JLayeredPane();
 		panelNombreJugador = new JPanel();
 		panelFinal = new JLayeredPane();
 		
 		mainPanel.add(panelSeleccionTema, "seleccionTema");
 		mainPanel.add(panelSeleccionNiveles, "seleccionNiveles");
-		mainPanel.add(panelPrincipal, "juego");
+		mainPanel.add(panelJuego, "juego");
 		mainPanel.add(panelNombreJugador, "nombreJugador");
 		mainPanel.add(panelFinal, "final");
 		
-		setSize(WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
-		setLocationRelativeTo(null);
-		setVisible(true);
-		
 		cardLayout.show(mainPanel, "seleccionTema");
+
+		//Movimientos con teclado
+        panelJuego.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {	
+				switch(e.getKeyCode()) {
+					case KeyEvent.VK_LEFT: 	{ if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.IZQUIERDA); break; }
+					case KeyEvent.VK_RIGHT: { if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.DERECHA); break; }
+					case KeyEvent.VK_UP: 	{ if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.ARRIBA);break; }
+					case KeyEvent.VK_DOWN: 	{ if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.ABAJO); break; }
+					case KeyEvent.VK_W:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.ARRIBA); break; }
+					case KeyEvent.VK_S:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.ABAJO); break; }
+					case KeyEvent.VK_A:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.IZQUIERDA); break; }
+					case KeyEvent.VK_D:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.DERECHA); break; } 
+				}
+			}
+		});		
 	}
 	
-	// ===================== PANEL DE SELECCIÓN DE NIVELES =====================
+	// ===================== PANEL DE SELECCIÓN DE TEMA =====================
 	private JLayeredPane crearPanelSeleccionTema() {
 		JLayeredPane panel = new JLayeredPane();
-		panel.setPreferredSize(new Dimension(WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME));
-		
-		Icon imgIcon = new ImageIcon(this.getClass().getResource("/imagenes/niveles/FondoProyecto2.png"));
+		Icon imgIcon = new ImageIcon(this.getClass().getResource("/imagenes/niveles/SeleccionTema.png"));
 		JLabel fondo = new JLabel(imgIcon);
 		fondo.setBounds(0, 0, WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
 		panel.add(fondo, 0);
@@ -173,6 +182,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Generador = (AbstractFactory)comboBox.getSelectedItem();
+				mi_juego.setGenerador(Generador);
 				setTitle(Generador.toString() + " Crush");
 				
 				prepararPanelSeleccionNiveles();
@@ -188,168 +198,188 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		return panel;
 	}
 
+	// ===================== PANEL DE SELECCIÓN DE NIVELES =====================
 	private void prepararPanelSeleccionNiveles() {
-		panelSeleccionNiveles.removeAll();
-		panelSeleccionNiveles.setPreferredSize(new Dimension(WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME));
-		
-		agregarFondoAlPanelNiveles();
-		agregarVidas();
-		agregarBotonRanking();
-		agregarBotonesNiveles();
-		
-		panelSeleccionNiveles.revalidate();
-		panelSeleccionNiveles.repaint();
-	}
+		Icon imgIcon = cargarIcono("/imagenes/niveles/"+Generador.toString()+"/PanelNivel.jpg");
+		JLabel fondo = new JLabel(imgIcon);
+		fondo.setBounds(0, 0, WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
+		panelSeleccionNiveles.add(fondo, 0);
 
-	private void agregarFondoAlPanelNiveles() {
-		Icon imgIcon2 = cargarIcono("/imagenes/niveles/"+Generador.toString()+"PN.jpg");
-		if (imgIcon2 != null) {
-			JLabel fondo2 = new JLabel(imgIcon2);
-			fondo2.setBounds(0, 0, WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
-			panelSeleccionNiveles.add(fondo2, 0);
-		}
-	}
-	
-	private void agregarVidas() {
 		Icon iconVidas = cargarIcono("/imagenes/niveles/vidas.png");
-		if (iconVidas != null) {
-			vida1 = new JLabel(iconVidas);
-			vida1.setBounds(280, 10, 50, 50);
-			panelSeleccionNiveles.add(vida1, 0);
-			
-			vida2 = new JLabel(iconVidas);
-			vida2.setBounds(320, 10, 50, 50);
-			panelSeleccionNiveles.add(vida2, 0);
-			
-			vida3 = new JLabel(iconVidas);
-			vida3.setBounds(360, 10, 50, 50);
-			panelSeleccionNiveles.add(vida3, 0);
-		}
+		vida1 = new JLabel(iconVidas);
+		vida1.setBounds(275, 350, 75, 75);
+		panelSeleccionNiveles.add(vida1, 0);
+		vida2 = new JLabel(iconVidas);
+		vida2.setBounds(325, 350, 75, 75);
+		panelSeleccionNiveles.add(vida2, 0);
+		vida3 = new JLabel(iconVidas);
+		vida3.setBounds(375, 350, 75, 75);
+		panelSeleccionNiveles.add(vida3, 0);
+
+		botonRanking = new JButton();
+		Icon iconRanking = cargarIcono("/imagenes/niveles/"+Generador.toString()+"/Ranking.png");
+		botonRanking.setIcon(iconRanking);
+        botonRanking.setBounds(260, 575, 180, 70);
+        botonRanking.setOpaque(false);
+		botonRanking.setBorderPainted(false);
+		botonRanking.setContentAreaFilled(false);
+		panelSeleccionNiveles.add(botonRanking, 0);
+		botonRanking.addActionListener(e -> mostrarRanking());
+
+		agregarBotonesNiveles();
 	}
 	
-	private void agregarBotonRanking() {
-		botonRanking = new JButton();
-		Icon iconRanking = cargarIcono("/imagenes/niveles/"+Generador.toString()+"Ranking.png");
-		if (iconRanking != null) {
-			botonRanking.setIcon(iconRanking);
-		}
-        botonRanking.setBounds(260, 519, 180, 70);
-        configurarBoton(botonRanking);
-		panelSeleccionNiveles.add(botonRanking, 0);
-		
-		botonRanking.addActionListener(e -> mostrarRanking());
-	}
-
 	private void mostrarRanking() {
-		if (timerglobal != null) timerglobal.stop();
+		if (timerglobal != null) 
+			timerglobal.stop();
         tablaPuntajes();
         dialogTablaRanking.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialogTablaRanking.setVisible(true);
-        panelPrincipal.requestFocusInWindow();
-        if (timerglobal != null) timerglobal.start();
+        panelJuego.requestFocusInWindow();
+        if (timerglobal != null) 
+			timerglobal.start();
 	}
 
 	private void agregarBotonesNiveles() {
-		botonNivel1 = crearBotonNivel(Generador.toString()+"BotonNivel1.png", 175, 300, 100, 100);
-		agregarBotonAlPanel(botonNivel1);
-		botonNivel1.addActionListener(e -> iniciarNivel());
+		botonNivel1 = crearBotonNivel(Generador.toString()+"/BotonNivel1.png", 200, 180, 100, 100);
+		panelSeleccionNiveles.add(botonNivel1, 0);
+		botonNivel1.addActionListener(e -> iniciarNivel(1));
 		
-		botonNivel2 = crearBotonNivel(Generador.toString()+"BotonNivelConCandado.png", 300, 300, 100, 100);
-		agregarBotonAlPanel(botonNivel2);
+		botonNivel2 = crearBotonNivel(Generador.toString()+"/BotonNivelConCandado.png", 315, 180, 100, 100);
+		panelSeleccionNiveles.add(botonNivel2, 0);
 		
-		botonNivel3 = crearBotonNivel(Generador.toString()+"BotonNivelConCandado.png", 425, 300, 100, 100);
-		agregarBotonAlPanel(botonNivel3);
+		botonNivel3 = crearBotonNivel(Generador.toString()+"/BotonNivelConCandado.png", 425, 180, 100, 100);
+		panelSeleccionNiveles.add(botonNivel3, 0);
 		
-		botonNivel4 = crearBotonNivel(Generador.toString()+"BotonNivelConCandado.png", 240, 400, 100, 100);
-		agregarBotonAlPanel(botonNivel4);
-		
-		botonNivel5 = crearBotonNivel(Generador.toString()+"BotonNivelConCandado.png", 365, 400, 100, 100);
-		agregarBotonAlPanel(botonNivel5);
+		botonNivel4 = crearBotonNivel(Generador.toString()+"/BotonNivelConCandado.png", 265, 260, 100, 100);
+		panelSeleccionNiveles.add(botonNivel4, 0);
+
+		botonNivel5 = crearBotonNivel(Generador.toString()+"/BotonNivelConCandado.png", 365, 260, 100, 100);
+		panelSeleccionNiveles.add(botonNivel5, 0);
 	}
 
-	private void agregarBotonAlPanel(JButton boton) {
-		panelSeleccionNiveles.add(boton, 0);
-	}
-	
 	private JButton crearBotonNivel(String imagenNombre, int x, int y, int ancho, int alto) {
 		JButton boton = new JButton();
 		Icon icon = cargarIcono("/imagenes/niveles/"+imagenNombre);
-		if (icon != null) {
-			boton.setIcon(icon);
-		}
+		boton.setIcon(icon);
 		boton.setBounds(x, y, ancho, alto);
-		configurarBoton(boton);
-		return boton;
-	}
-	
-	private void configurarBoton(JButton boton) {
 		boton.setOpaque(false);
 		boton.setBorderPainted(false);
 		boton.setContentAreaFilled(false);
+		return boton;
 	}
 	
 	// ===================== PANEL JUEGO =====================
-	private void iniciarNivel() {
-		panelSeleccionNiveles.removeAll();
-		setSize(WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
-		setLocationRelativeTo(null);
+	private void iniciarNivel(int nivel) {
+		cardLayout.show(mainPanel, "juego");
 
-		mi_juego.cargarDatos(Generador);
-		filas = mi_juego.getTablero().get_filas();
-		columnas = mi_juego.getTablero().get_columnas();
+		mi_juego.cargarDatos(nivel, Generador);
 		mi_juego.asociar();
-		mi_juego.setGenerador(Generador);
+		mi_juego.set_movimientos();
 		
-		Icon fondoNiveles = new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"FondoNiveles.png"));
+		Icon fondoNiveles = new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/FondoNiveles.png"));
 		JLabel labelFondoNiveles = new JLabel(fondoNiveles);
 		labelFondoNiveles.setBounds(0, 0, WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
+		panelJuego.add(labelFondoNiveles, JLayeredPane.DEFAULT_LAYER);
 		
-		panelPrincipal.setSize(SIZE_LABEL * filas, SIZE_LABEL * columnas);
-		panelPrincipal.add(labelFondoNiveles, JLayeredPane.DEFAULT_LAYER);
-		panelPrincipal.setLayout(null);
-		panelPrincipal.setVisible(true);
-		
-		mi_juego.set_movimientos();
-		int movimientos = mi_juego.get_movimientos();
-        contadorMovimientos = new JLabel("Movimientos: "+movimientos);
-        contadorMovimientos.setFont(new Font("Ink Free", Font.BOLD, 50));
-        contadorMovimientos.setBounds(70, 586, 380, 70);
-        panelPrincipal.add(contadorMovimientos, 0);
-	
         cargar_objetivos();
-        
-        botonRanking.setBounds(480, 28, 180, 70);
-		panelPrincipal.add(botonRanking, 0);
+        botonRanking.setBounds(500, 7, 165, 50);
+		panelJuego.add(botonRanking, 0);
 		
 		int puntaje = mi_juego.get_jugador_actual().get_puntaje_acumulado();
         contadorPuntaje = new JLabel("Puntaje: "+puntaje);
-        contadorPuntaje.setFont(new Font("Ink Free", Font.BOLD, 50));
-        contadorPuntaje.setBounds(70, 520, 380, 70);
-        panelPrincipal.add(contadorPuntaje, 0);
+        contadorPuntaje.setFont(new Font("Monospaced", Font.BOLD, 50));
+        contadorPuntaje.setBounds(70, 540, 500, 70);
+        panelJuego.add(contadorPuntaje, 0);
+
+		int movimientos = mi_juego.get_movimientos();
+        contadorMovimientos = new JLabel("Movimientos: "+movimientos);
+        contadorMovimientos.setFont(new Font("Monospaced", Font.BOLD, 50));
+        contadorMovimientos.setBounds(70, 590, 500, 70);
+        panelJuego.add(contadorMovimientos, 0);
         
-        panelPrincipal.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {	
-				switch(e.getKeyCode()) {
-					case KeyEvent.VK_LEFT: 	{ if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.IZQUIERDA); break; }
-					case KeyEvent.VK_RIGHT: { if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.DERECHA); break; }
-					case KeyEvent.VK_UP: 	{ if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.ARRIBA);break; }
-					case KeyEvent.VK_DOWN: 	{ if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.ABAJO); break; }
-					case KeyEvent.VK_W:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.ARRIBA); break; }
-					case KeyEvent.VK_S:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.ABAJO); break; }
-					case KeyEvent.VK_A:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.IZQUIERDA); break; }
-					case KeyEvent.VK_D:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.DERECHA); break; } 
-				}
-			}
-		});
-        
-        panelPrincipal.setFocusable(true);
-		panelPrincipal.revalidate();
-		panelPrincipal.repaint();
-		
-		cardLayout.show(mainPanel, "juego");
-		panelPrincipal.requestFocusInWindow();
+		panelJuego.setLayout(null);
+		panelJuego.setVisible(true);
+        panelJuego.setFocusable(true);
+		panelJuego.revalidate();
+		panelJuego.repaint();
+		panelJuego.requestFocusInWindow();
 	}		
 
+	// ===================== GANAR NIVEL =====================
+	public void ganarNivel() {
+		SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+	        @Override
+	        protected Void doInBackground() throws Exception {
+	            Thread.sleep(500); 
+	            return null;
+	        }
+
+	        @Override
+	        protected void done() {
+				mi_juego.sumarPuntos();
+
+	            JLabel victoria = new JLabel();
+	            victoria.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/victoria.gif")));
+	            victoria.setBounds(panelJuego.getWidth() / 2 - 150, panelJuego.getHeight() / 2 - 150, 300, 300);
+	            victoria.setVisible(true);
+	            panelJuego.add(victoria, 0);
+
+	            JButton levelUp = new JButton();
+	            levelUp.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/LevelUp.png")));
+	            levelUp.setBounds(panelJuego.getWidth() / 2 - 150, panelJuego.getHeight() / 2 - 150, 300, 300);
+	            levelUp.setOpaque(false);
+	            levelUp.setBorderPainted(false);
+	            levelUp.setContentAreaFilled(false);
+	            panelJuego.add(levelUp, 0);
+	            
+	            levelUp.addActionListener(new ActionListener() {
+	                public void actionPerformed (ActionEvent e) {
+	                	limpiarEntidades();
+						cardLayout.show(mainPanel, "seleccionNiveles");
+	                	bloquearNivelesAnteriores();
+
+	                	switch(mi_juego.nivelActual()) {
+	                		case 1:
+	                			botonNivel2.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/BotonNivel2.png")));
+	                			configuraBotonNivel(botonNivel2, 2);
+	                			break;
+	                		case 2:
+	                			botonNivel3.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/BotonNivel3.png")));
+	                			configuraBotonNivel(botonNivel3, 3);
+	                			break;
+	                		case 3:
+	                			botonNivel4.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/BotonNivel4.png")));
+	                			configuraBotonNivel(botonNivel4, 4);
+	                			break;
+	                		case 4:
+	                			botonNivel5.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/BotonNivel5.png")));
+	                			configuraBotonNivel(botonNivel5, 5);
+	                			break;
+	                		case 5:
+	                			terminarJuego();
+	                			break;
+	                	}
+	                }
+	            });
+	        }
+	    };
+	    worker.execute();
+	}
+
+	private void configuraBotonNivel(JButton boton, int nivel) {
+		ActionListener[] listeners = boton.getActionListeners();
+		if (listeners.length > 0) 
+			boton.removeActionListener(listeners[0]);
+		
+		boton.addActionListener(new ActionListener() {
+			public void actionPerformed (ActionEvent e) {
+				iniciarNivel(nivel);
+			}
+		});
+	}
+
+	// ===================== GAME OVER =====================
 	public void mostrarGameOver() {
 	    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 	        @Override
@@ -379,12 +409,12 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	            exit.setBorderPainted(false);
 	            exit.setContentAreaFilled(false);
 	            
-	            panelPrincipal.add(gameOver, 0);
-	            panelPrincipal.add(retry, 0);
-	            panelPrincipal.add(exit, 0);
-	            panelPrincipal.setFocusable(false);
-	            panelPrincipal.revalidate();
-	            panelPrincipal.repaint();
+	            panelJuego.add(gameOver, 0);
+	            panelJuego.add(retry, 0);
+	            panelJuego.add(exit, 0);
+	            panelJuego.setFocusable(false);
+	            panelJuego.revalidate();
+	            panelJuego.repaint();
 	            
 	            retry.addActionListener(new ActionListener() {
 	                public void actionPerformed (ActionEvent e) {
@@ -398,11 +428,11 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	                        retry.setVisible(false);
 	                        
 	                        botonRanking.setBounds(480, 28, 180, 70);
-	                        panelPrincipal.add(botonRanking, 0);
+	                        panelJuego.add(botonRanking, 0);
 	                        
 	                        mi_juego.set_movimientos();		    
 	                    } else {                     
-	                        volverAlPanelNiveles();
+	                        cardLayout.show(mainPanel, "seleccionNiveles");
 	                        limpiarEntidades();
 	                        bloquearTodosLosNiveles();
 	                        gameOver.setVisible(false);
@@ -433,83 +463,10 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	    }
 	}
 	
-	public void ganarNivel() {
-		SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-	        @Override
-	        protected Void doInBackground() throws Exception {
-	            Thread.sleep(500); 
-	            return null;
-	        }
-
-	        @Override
-	        protected void done() {
-	            JLabel victoria = new JLabel();
-	            victoria.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"-dance.gif")));
-	            victoria.setBounds(panelPrincipal.getWidth() / 2 - 150, panelPrincipal.getHeight() / 2 - 150, 300, 300);
-	            victoria.setVisible(true);
-	            panelPrincipal.add(victoria, 0);
-
-	            JButton levelUp = new JButton();
-	            levelUp.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"LevelUp.png")));
-	            levelUp.setBounds(panelPrincipal.getWidth() / 2 - 150, panelPrincipal.getHeight() / 2 - 150, 300, 300);
-	            levelUp.setOpaque(false);
-	            levelUp.setBorderPainted(false);
-	            levelUp.setContentAreaFilled(false);
-	            panelPrincipal.add(levelUp, 0);
-	            
-	            panelPrincipal.revalidate();
-	            panelPrincipal.repaint();
-	            
-	            levelUp.addActionListener(new ActionListener() {
-	                public void actionPerformed (ActionEvent e) {
-	                	volverAlPanelNiveles();
-	                	limpiarEntidades();
-	                	
-	                	if(mi_juego.nivelActual() == 1) {
-	                		botonNivel2.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"BotonNivel2.png")));
-	                		mi_juego.cargarProximoNivel();
-	                		configuraBotonNivel(botonNivel2);
-	                	} else if(mi_juego.nivelActual() == 2) {
-	                		botonNivel3.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"BotonNivel3.png")));
-	                		mi_juego.cargarProximoNivel();
-	                		configuraBotonNivel(botonNivel3);
-	                	} else if(mi_juego.nivelActual() == 3) {
-	                		botonNivel4.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"BotonNivel4.png")));
-	                		mi_juego.cargarProximoNivel();
-	                		configuraBotonNivel(botonNivel4);
-	                	} else if(mi_juego.nivelActual() == 4) {
-	                		botonNivel5.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"BotonNivel5.png")));
-	                		mi_juego.cargarProximoNivel();
-	                		configuraBotonNivel(botonNivel5);
-	                	} else if(mi_juego.nivelActual() == 5) {
-	                		terminarJuego();
-	                	}
-	                }
-	            });
-	        }
-	    };
-	    worker.execute();
-	}
-	
-	private void configuraBotonNivel(JButton boton) {
-		boton.removeActionListener(boton.getActionListeners()[0]);
-		boton.addActionListener(new ActionListener() {
-		    public void actionPerformed (ActionEvent e) {
-		    	iniciarNivel();
-		    }
-		});
-	}
-
-	private void volverAlPanelNiveles() {
-		setSize(700, 700);
-		setLocationRelativeTo(null);
-		cardLayout.show(mainPanel, "seleccionNiveles");
-	}
-	
 	public void limpiarEntidades() {
-	    panelPrincipal.removeAll();
-	    panelPrincipal.revalidate();
-	    panelPrincipal.repaint();
+	    panelJuego.removeAll();
+	    panelJuego.revalidate();
+	    panelJuego.repaint();
 	}
 
 	public void panelSetNombreJugador() {
@@ -666,24 +623,17 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	}
 
 	public void bloquearNivelesAnteriores() {
-		if (mi_juego.nivelActual() == 2)
-			botonNivel1.setEnabled(false);
-		if (mi_juego.nivelActual() == 3) {
-			botonNivel1.setEnabled(false);	
-			botonNivel2.setEnabled(false);
+		switch(mi_juego.nivelActual()) {
+			case 4:
+				botonNivel4.setEnabled(false);
+			case 3:
+				botonNivel3.setEnabled(false);
+			case 2:
+				botonNivel2.setEnabled(false);
+			case 1:
+				botonNivel1.setEnabled(false);
+				break;
 		}
-		if (mi_juego.nivelActual() == 4) {
-			botonNivel1.setEnabled(false);
-			botonNivel2.setEnabled(false);
-			botonNivel3.setEnabled(false);
-		}
-		if (mi_juego.nivelActual() == 5) {
-			botonNivel1.setEnabled(false);
-			botonNivel2.setEnabled(false);
-			botonNivel3.setEnabled(false);
-			botonNivel4.setEnabled(false);
-		}
-		
 	}
 	
 	public void bloquearTodosLosNiveles() {
@@ -702,18 +652,18 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		
 		for(Objetivo obejetivo : objetivos) {
 			if(obejetivo.get_image_path()!= null) {
-				contador_aux = new JLabel(" " + obejetivo.get_cantidad());;
-	    		contador_aux.setFont(new Font("Ink Free", Font.BOLD, 58));
-	    		contador_aux.setBounds(564, filaAux-5, 110, 70);
-	    		panelPrincipal.add(contador_aux, 0);
+				contador_aux = new JLabel(String.valueOf(obejetivo.get_cantidad()));
+	    		contador_aux.setFont(new Font("MONOSPACED", Font.BOLD, 58));
+	    		contador_aux.setBounds(625, filaAux-5, 110, 70);
+	    		panelJuego.add(contador_aux, 0);
 	    		contadores.add(contador_aux);
 	    		
 	    		JLabel carameloGeneral = new JLabel();
 	    		carameloGeneral.setIcon(new ImageIcon(this.getClass().getResource(obejetivo.get_image_path())));
-	    		carameloGeneral.setBounds(494, filaAux, 60, 60);
-	    		panelPrincipal.add(carameloGeneral, 0);
+	    		carameloGeneral.setBounds(550, filaAux, 60, 60);
+	    		panelJuego.add(carameloGeneral, 0);
 	    		
-	    		filaAux = filaAux + 96;
+	    		filaAux = filaAux + 60;
 			}
 		}
 		
@@ -726,7 +676,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 			if(objetivo.get_cantidad() == 0)
 				contadores.remove(aux);
 			else
-				contadores.get(aux).setText(" " + (objetivo.get_cantidad()) );
+				contadores.get(aux).setText(String.valueOf(objetivo.get_cantidad()));
 			aux++;
 		}
 	}
@@ -778,7 +728,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	
 	public EntidadGrafica agregar_entidad(EntidadLogica e) {
 		Celda celda = new Celda(this, e, SIZE_LABEL);
-		panelPrincipal.add(celda, 0);
+		panelJuego.add(celda, 0);
 		return celda;
 	}
 	
@@ -786,14 +736,14 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		//Caramelos que caen
 		Celda celda = new Celda(this, e, SIZE_LABEL);
 		celda.setBounds((e.get_columna()+1)*SIZE_LABEL, (fila)*SIZE_LABEL, SIZE_LABEL, SIZE_LABEL);
-		panelPrincipal.add(celda, 0);
+		panelJuego.add(celda, 0);
 		return celda;
 	}
 	
 	public EntidadGrafica agregar_entidad_nueva(Potenciador p) {
 		//Potenciadores que aparecen luego de la detonacion
 		Celda celda = new Celda(this, p, SIZE_LABEL);
-		panelPrincipal.add(celda, 0);
+		panelJuego.add(celda, 0);
 		celda.imagen_vacia();
 		animar_creacion_con_delay(celda);
 		return celda;
@@ -834,7 +784,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	}
 	
 	public void eliminar_celda(Celda celda) {
-		panelPrincipal.remove(celda);
-		panelPrincipal.repaint();
+		panelJuego.remove(celda);
+		panelJuego.repaint();
 	}
 }

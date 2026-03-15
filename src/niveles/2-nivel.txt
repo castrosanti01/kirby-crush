@@ -8,7 +8,6 @@ Columnas: 7
 Movimientos: 15
 
 # Objetivo del nivel
-Objetivo: Eliminar 30 caramelos rosas en 25 movimientos o menos
 RosasFaltantes: 10
 
 # Tiempo límite en segundos

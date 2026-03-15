@@ -38,8 +38,9 @@ public class Juego {
 		jugador_actual = new Jugador();
 	}
 
-	public void cargarDatos(AbstractFactory generador) {
-		mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/1-nivel.txt"), generador, mi_tablero);
+	public void cargarDatos(int nivel, AbstractFactory generador) {
+		String nivelPath = "/niveles/" + nivel + "-nivel.txt";
+		mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream(nivelPath), generador, mi_tablero);
 		skin = generador;
 	}
 
@@ -188,38 +189,9 @@ public class Juego {
 		mi_ventana.actualizar_objetivos(manager_objetivos.get_lista());
 	}
 
-	public void cargarProximoNivel() {
-		switch (nivelActual()) {
-			case 1:
-			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/2-nivel.txt"), skin, mi_tablero);
-			break;
-			case 2:
-			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/3-nivel.txt"), skin, mi_tablero);
-			break;
-			case 3:
-			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/4-nivel.txt"), skin, mi_tablero);
-			break;
-			case 4:
-			mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream("/niveles/5-nivel.txt"), skin, mi_tablero);
-			break;
-			default:
-			break;
-		}
-		tiempo_restante = mi_nivel.get_tiempo_restante();
-		movimientos = mi_nivel.get_movimientos();
-		vidas = 3;
-		
-		asociar_entidades_logicas_graficas(); // Vuelve a asociar las entidades lógicas con las entidades gráficas
-
-		mi_tablero.fijar_jugador(mi_nivel.get_fila_inicial_jugador(),
-		mi_nivel.get_columna_inicial_jugador());
-		mi_ventana.contadorMovimientos.setText("Movimientos: " + movimientos);
+	public void sumarPuntos(){
 		jugador_actual.sumar_puntos_del_nivel();
 		mi_ventana.contadorPuntaje.setText("Puntaje: " + jugador_actual.get_puntaje_acumulado());
-		
-		mi_ventana.repaint();
-		
-		mi_ventana.bloquearNivelesAnteriores();
 	}
 
 	public int nivelActual() {
