@@ -74,7 +74,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	// ===================== COMPONENTES DE NAVEGACIÓN =====================
 	private JButton botonKirby, botonZelda;
 	private JButton botonNivel1, botonNivel2, botonNivel3, botonNivel4, botonNivel5;
-	private JButton botonRanking;
+	private JButton botonRankingNiveles, botonRankingJuego;
 	
 	// ===================== COMPONENTES DE VIDAS =====================
 	private JLabel vida1, vida2, vida3;
@@ -126,9 +126,9 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		cardLayout.show(mainPanel, "seleccionTema");
 
 		//Ranking
+		deserializacionRanking();
 		dialogTablaRanking = new JDialog(Ventana.this, "RANKING - Top 5", true);
 		dialogTablaRanking.setIconImage(new ImageIcon(this.getClass().getResource("/imagenes/icono/kirbyicon.png")).getImage());
-		deserializacionRanking();
 
 		//Movimientos con teclado
         panelJuego.addKeyListener(new KeyAdapter() {
@@ -213,20 +213,19 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		vida3.setBounds(375, 350, 75, 75);
 		panelSeleccionNiveles.add(vida3, 0);
 
-		botonRanking = new JButton();
+		botonRankingNiveles = new JButton();
 		Icon iconRanking = cargarIcono("/imagenes/niveles/"+Generador.toString()+"/BotonRanking.png");
-		botonRanking.setIcon(iconRanking);
-        botonRanking.setBounds(260, 575, 180, 70);
-        botonRanking.setOpaque(false);
-		botonRanking.setBorderPainted(false);
-		botonRanking.setContentAreaFilled(false);
-		panelSeleccionNiveles.add(botonRanking, 0);
-		botonRanking.addActionListener(e -> mostrarRanking());
+		botonRankingNiveles.setIcon(iconRanking);
+        botonRankingNiveles.setBounds(260, 575, 180, 70);
+        botonRankingNiveles.setOpaque(false);
+		botonRankingNiveles.setBorderPainted(false);
+		botonRankingNiveles.setContentAreaFilled(false);
+		panelSeleccionNiveles.add(botonRankingNiveles, 0);
+		botonRankingNiveles.addActionListener(e -> mostrarRanking());
 
 		agregarBotonesNiveles();
 	}
 	
-
 	private void agregarBotonesNiveles() {
 		botonNivel1 = crearBotonNivel(Generador.toString()+"/BotonNivel1.png", 200, 180, 100, 100);
 		panelSeleccionNiveles.add(botonNivel1, 0);
@@ -270,8 +269,15 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		panelJuego.add(labelFondoNiveles, JLayeredPane.DEFAULT_LAYER);
 		
         cargar_objetivos();
-        botonRanking.setBounds(500, 7, 165, 50);
-		panelJuego.add(botonRanking, 0);
+        botonRankingJuego = new JButton();
+        Icon iconRankingJuego = cargarIcono("/imagenes/niveles/"+Generador.toString()+"/BotonRanking.png");
+        botonRankingJuego.setIcon(iconRankingJuego);
+        botonRankingJuego.setBounds(500, 7, 165, 50);
+        botonRankingJuego.setOpaque(false);
+        botonRankingJuego.setBorderPainted(false);
+        botonRankingJuego.setContentAreaFilled(false);
+        botonRankingJuego.addActionListener(e -> mostrarRanking());
+		panelJuego.add(botonRankingJuego, 0);
 		
 		int puntaje = mi_juego.get_jugador_actual().get_puntaje_acumulado();
         contadorPuntaje = new JLabel("Puntaje: "+puntaje);
@@ -539,14 +545,13 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		if (timerglobal != null) 
 			timerglobal.stop();
         tablaPuntajes();
-        dialogTablaRanking.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialogTablaRanking.setVisible(true);
         panelJuego.requestFocusInWindow();
         if (timerglobal != null) 
 			timerglobal.start();
 	}
 
-	public void tablaPuntajes() {
+	private void tablaPuntajes() {
 	    dialogTablaRanking.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	    dialogTablaRanking.setSize(300, 150);
 	    dialogTablaRanking.setLocationRelativeTo(null);
@@ -572,7 +577,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	    dialogTablaRanking.add(scrollPane);
 	}
 	
-	public void setNombreJugador() {
+	private void setNombreJugador() {
 		JDialog frameNombreJugador = new JDialog(Ventana.this, "Jugador", true);
 	    frameNombreJugador.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 	    frameNombreJugador.setSize(350, 180);
@@ -608,9 +613,8 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	            	mi_juego.get_jugador_actual().set_nombre(nombre);
 	            	mi_juego.getTopJugadores().agregar_jugador(mi_juego.get_jugador_actual());
 	                frameNombreJugador.dispose(); 
-	                tablaPuntajes();			        
-	                serializacionRanking();
-	                dialogTablaRanking.setVisible(true);            
+					serializacionRanking();
+					mostrarRanking();			        
 	            } else {
 	                JOptionPane.showMessageDialog(frameNombreJugador, "Por favor, ingrese nombre de jugador.", "Campo vacío", JOptionPane.WARNING_MESSAGE);
 	            }
@@ -629,7 +633,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	
 	private void serializacionRanking() {
 		try {
-			FileOutputStream fileOutputStream = new FileOutputStream("./puntaje/ranking.tdp");
+			FileOutputStream fileOutputStream = new FileOutputStream("./src/puntaje/ranking.tdp");
 		    ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 		    objectOutputStream.writeObject(mi_juego.getTopJugadores());
 		    objectOutputStream.flush();
@@ -645,7 +649,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	
 	private void deserializacionRanking() {
 		try {
-			FileInputStream fileInputStream = new FileInputStream("./puntaje/ranking.tdp");
+			FileInputStream fileInputStream = new FileInputStream("./src/puntaje/ranking.tdp");
 		    ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 		    mi_juego.set_top_jugadores((TopJugadores) objectInputStream.readObject());
 		    objectInputStream.close();

@@ -22,6 +22,11 @@ public class CentralAnimaciones implements ManejadorAnimaciones{
 	protected HashMap<Celda, List<Animador>> mapeo_celda_animadores;
 	protected int prioridad_ultimo_animador_lanzado;
 	protected int cantidad_animadores_ultima_prioridad_lanzados;
+	// Fase actual de animaciones: para asegurar que no se mezclen detonaciones con caídas
+	protected int fase_actual;
+	protected static final int FASE_LIBRE = 0;
+	protected static final int FASE_DETONACION = 1016;
+	protected static final int FASE_CAIDA = 1017;
 	
 	
 	public CentralAnimaciones(Ventana ventana) {
@@ -30,6 +35,7 @@ public class CentralAnimaciones implements ManejadorAnimaciones{
 		mapeo_celda_animadores = new HashMap<Celda, List<Animador>>();
 		prioridad_ultimo_animador_lanzado = PrioridadAnimaciones.PRIORIDAD_SIN_PRIORIDAD;
 		cantidad_animadores_ultima_prioridad_lanzados = 0;
+		fase_actual = FASE_LIBRE;
 	}
 	
 	public void animar_intercambio(Celda celda) {
@@ -91,6 +97,12 @@ public class CentralAnimaciones implements ManejadorAnimaciones{
 	protected void incrementar_animadores_activos_y_actualizar_ultima_prioridad_lanzado(int prioridad_ultimo) {
 		prioridad_ultimo_animador_lanzado = prioridad_ultimo;
 		cantidad_animadores_ultima_prioridad_lanzados ++;
+		// Establecer la fase actual
+		if (prioridad_ultimo == PrioridadAnimaciones.PRIORIDAD_DETONACION) {
+			fase_actual = FASE_DETONACION;
+		} else if (prioridad_ultimo == PrioridadAnimaciones.PRIORIDAD_CAIDA) {
+			fase_actual = FASE_CAIDA;
+		}
 	}
 	
 	protected boolean existen_pendientes() {
@@ -121,9 +133,23 @@ public class CentralAnimaciones implements ManejadorAnimaciones{
 		if (existen_pendientes()) {
 			animador_en_tope_espera = animadores_pendientes.get(0);
 			celda_animador = animador_en_tope_espera.get_celda_asociada();
-			retorno = ! tiene_animadores_en_progreso(celda_animador);
 			prioridad_animador = animador_en_tope_espera.get_prioridad();
-			retorno = retorno && tiene_igual_prioridad_que_ultimo_animador_lanzado(prioridad_animador);
+			
+			// Verificar que la celda está libre
+			boolean celda_libre = ! tiene_animadores_en_progreso(celda_animador);
+			
+			// Verificar que tiene IGUAL prioridad que el último lanzado
+			boolean misma_prioridad = tiene_igual_prioridad_que_ultimo_animador_lanzado(prioridad_animador);
+			
+			// CRÍTICO: No permitir cambio de fase si hay animadores activos
+			// Si intenta cambiar de prioridad mientras hay activos, NO se ejecuta
+			if (misma_prioridad && celda_libre) {
+				retorno = true;
+			}
+			// Si es diferente prioridad, solo permitir si NO hay animadores activos
+			else if (!misma_prioridad && cantidad_animadores_ultima_prioridad_lanzados == 0 && celda_libre) {
+				retorno = true;
+			}
 		}
 		return retorno;
 	}
@@ -160,7 +186,10 @@ public class CentralAnimaciones implements ManejadorAnimaciones{
 	
 	protected void decrementar_animadores_activos_y_actualizar_ultima_prioridad_lanzado() {
 		cantidad_animadores_ultima_prioridad_lanzados --;
-		if (cantidad_animadores_ultima_prioridad_lanzados == 0)
+		if (cantidad_animadores_ultima_prioridad_lanzados == 0) {
+			// Cuando termina una fase, resetear para permitir la siguiente
 			prioridad_ultimo_animador_lanzado = PrioridadAnimaciones.PRIORIDAD_SIN_PRIORIDAD;
+			fase_actual = FASE_LIBRE;
+		}
 	}
 }
