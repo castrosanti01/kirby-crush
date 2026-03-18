@@ -16,6 +16,12 @@ public interface EntidadGrafica {
 	 * movimiento.
 	 */
 	public void notificarse_cambio_posicion();
+
+	/**
+	 * Notifica a la entidad gráfica de que, la entidad lógica, aplicó gravedad.
+	 * Desencadena la actualización de la entidad gráfica en la ventana de la aplicación, considerando el nuevo estado.
+	 */
+	public void notificarse_gravedad();
 	
 	/**
 	 * Notifica a la entidad gráfica de que, la entidad lógica, se detonó.

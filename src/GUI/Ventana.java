@@ -90,6 +90,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	// ===================== ANIMACIONES Y TIMERS =====================
 	private int animaciones_pendientes;
 	private boolean bloquear_intercambios;
+	private boolean cartelWin;
 	private Timer timerglobal;
 
 	
@@ -102,6 +103,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		
 		animaciones_pendientes = 0;
 		bloquear_intercambios = false;
+		cartelWin = false;
 		timerglobal = new Timer(10000, null);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -134,14 +136,14 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
         panelJuego.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {	
 				switch(e.getKeyCode()) {
-					case KeyEvent.VK_LEFT: 	{ if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.IZQUIERDA); break; }
-					case KeyEvent.VK_RIGHT: { if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.DERECHA); break; }
-					case KeyEvent.VK_UP: 	{ if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.ARRIBA);break; }
-					case KeyEvent.VK_DOWN: 	{ if (!bloquear_intercambios) mi_juego.mover_jugador(Juego.ABAJO); break; }
-					case KeyEvent.VK_W:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.ARRIBA); break; }
-					case KeyEvent.VK_S:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.ABAJO); break; }
-					case KeyEvent.VK_A:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.IZQUIERDA); break; }
-					case KeyEvent.VK_D:		{ if (!bloquear_intercambios) mi_juego.intercambiar_entidades(Juego.DERECHA); break; } 
+					case KeyEvent.VK_LEFT: 	{ if (!bloquear_intercambios && !cartelWin) mi_juego.mover_jugador(Juego.IZQUIERDA); break; }
+					case KeyEvent.VK_RIGHT: { if (!bloquear_intercambios && !cartelWin) mi_juego.mover_jugador(Juego.DERECHA); break; }
+					case KeyEvent.VK_UP: 	{ if (!bloquear_intercambios && !cartelWin) mi_juego.mover_jugador(Juego.ARRIBA);break; }
+					case KeyEvent.VK_DOWN: 	{ if (!bloquear_intercambios && !cartelWin) mi_juego.mover_jugador(Juego.ABAJO); break; }
+					case KeyEvent.VK_W:		{ if (!bloquear_intercambios && !cartelWin) mi_juego.intercambiar_entidades(Juego.ARRIBA); break; }
+					case KeyEvent.VK_S:		{ if (!bloquear_intercambios && !cartelWin) mi_juego.intercambiar_entidades(Juego.ABAJO); break; }
+					case KeyEvent.VK_A:		{ if (!bloquear_intercambios && !cartelWin) mi_juego.intercambiar_entidades(Juego.IZQUIERDA); break; }
+					case KeyEvent.VK_D:		{ if (!bloquear_intercambios && !cartelWin) mi_juego.intercambiar_entidades(Juego.DERECHA); break; } 
 				}
 			}
 		});		
@@ -337,10 +339,11 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 
 	// ===================== GANAR NIVEL =====================
 	public void ganarNivel() {
+		cartelWin = true;
 		SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 	        @Override
 	        protected Void doInBackground() throws Exception {
-	            Thread.sleep(500); 
+	            Thread.sleep(2000); 
 	            return null;
 	        }
 
@@ -365,6 +368,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	            levelUp.addActionListener(new ActionListener() {
 	                public void actionPerformed (ActionEvent e) {
 	                	limpiarEntidades();
+						cartelWin = false;
 						cardLayout.show(mainPanel, "seleccionNiveles");
 	                	bloquearNivelesAnteriores();
 
@@ -764,6 +768,10 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 
 	public void animar_detonacion(Celda c) {
 	    mi_animador.animar_detonacion(c);
+	}
+
+	public void animar_gravedad(Celda c) {
+	    mi_animador.animar_gravedad(c);
 	}
 	
 	public void animar_caida(Celda celda) {

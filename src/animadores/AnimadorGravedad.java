@@ -3,7 +3,7 @@ package animadores;
 import GUI.Celda;
 import manejadorAnimaciones.CentralAnimaciones;
 
-public class AnimadorCaida extends Thread implements Animador {
+public class AnimadorGravedad extends Thread implements Animador {
 
 	protected CentralAnimaciones manager;
 	protected Celda celda_animada;
@@ -15,12 +15,12 @@ public class AnimadorCaida extends Thread implements Animador {
 	protected int pos_x_destino;
 	protected int pos_y_destino;
 	
-	public AnimadorCaida(CentralAnimaciones manager, int step, int delay, Celda celda) {
+	public AnimadorGravedad(CentralAnimaciones manager, int step, int delay, Celda celda) {
 		this.manager = manager;
 		this.celda_animada = celda;
 		this.step = step;
 		this.delay = delay;
-		prioridad = PrioridadAnimaciones.PRIORIDAD_CAIDA; 
+		prioridad = PrioridadAnimaciones.PRIORIDAD_INTERCAMBIO_VACIO; 
 				
 		int size_label = celda_animada.get_size_label();
 		pos_x_destino = (celda.get_entidad_logica().get_columna()+1) * size_label;
@@ -37,7 +37,6 @@ public class AnimadorCaida extends Thread implements Animador {
 	
 	public void comenzar_animacion() {
 		this.start();
-		
 	}
 	
 	public void run() {
@@ -71,6 +70,3 @@ public class AnimadorCaida extends Thread implements Animador {
 		manager.notificarse_finalizacion_animador(this);
 	}
 }
-
- 
-

@@ -101,6 +101,12 @@ public abstract class Entidad implements EntidadLogica, Enfocable, Intercambiabl
 		columna = nc;
 		entidad_grafica.notificarse_cambio_posicion();
 	}
+
+	public void aplicar_gravedad(int nf, int nc) {
+		fila = nf;
+		columna = nc;
+		entidad_grafica.notificarse_gravedad();
+	}
 	
 	@Override
 	public void caer(int nf, int nc) {

@@ -44,4 +44,10 @@ public interface VentanaAnimable {
 	 */
 	public void animar_creacion_con_delay(Celda celda);
 
+	/**
+	 * Solicita que se anime la gravedad de una celda
+	 * @param c La celda que debe caer, de forma animada.
+	 */
+    public void animar_gravedad(Celda celda);
+
 }

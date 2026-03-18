@@ -138,8 +138,6 @@ public class Tablero {
 				if(eliminar.size() >= 3 | eliminar_2.size() >= 3 ) {
 					procesar_eliminacion(eliminar, movimiento_vertical);
 					procesar_eliminacion(eliminar_2, movimiento_vertical);
-					nf = pos_f_jugador;
-				    nc = pos_c_jugador;
 					
 			        // Bucle refill
 			        boolean hay_nuevos_match = true;
@@ -275,17 +273,30 @@ public class Tablero {
 		mi_juego.actualizar_objetivos();
 		
 		int fila_aux = -1;
+
+		//ordenar elminar de menor a mayor fila para que la caida de los caramelos sea correcta
+		eliminar.sort((e1, e2) -> Integer.compare(e1.get_fila(), e2.get_fila()));
 		
+		//Movimiento logico
 		for(Entidad e : eliminar) {
-			if(entidades[e.get_fila()][e.get_columna()].get_detonada()) {
-			    subir_vacio(e.get_fila(), e.get_columna());
-			    Entidad nuevo_caramelo;
-		        nuevo_caramelo = new Caramelo(e.get_fila(), e.get_columna(), Color.color_random(), "/imagenes/caramelos/" + mi_juego.getGenerador().toString() + "-", this);
-		        agregar_entidad(nuevo_caramelo);
-		        mi_juego.asociar_entidad_logica_grafica_nueva(nuevo_caramelo, fila_aux);
-		        nuevo_caramelo.caer(e.get_fila(), e.get_columna());
-		        fila_aux--;
-		    }
+			subir_vacio(e.get_fila(), e.get_columna());
+		}
+
+		//Movimiento grafico (puede ser mas optimo)
+		for(int f = 0; f < filas; f++) {
+			for(int c = 0; c < columnas; c++) {
+				entidades[f][c].aplicar_gravedad(f, c);
+			}
+		}
+
+		//Creacion entidades nuevas
+		for(Entidad e : eliminar) {
+			Entidad nuevo_caramelo;
+			nuevo_caramelo = new Caramelo(e.get_fila(), e.get_columna(), Color.color_random(), "/imagenes/caramelos/" + mi_juego.getGenerador().toString() + "-", this);
+			agregar_entidad(nuevo_caramelo);
+			mi_juego.asociar_entidad_logica_grafica_nueva(nuevo_caramelo, fila_aux);
+			nuevo_caramelo.caer(e.get_fila(), e.get_columna());
+			fila_aux--;
 		}
 	}
 	
@@ -368,22 +379,19 @@ public class Tablero {
         pos_c_jugador = nc;    
 	}
 	
-	private void aplicar_caida(int af, int ac, int nf, int nc) {
+	private void aplicar_intercambio_vacio(int af, int ac, int nf, int nc) {
 	    Entidad entidad_uno = entidades[af][ac];
 	    Entidad entidad_dos = entidades[nf][nc];
 
         Entidad entidad_aux = entidad_uno;
-        entidad_uno.caer(nf, nc);
-        entidad_dos.caer(af, ac);
         entidades[af][ac] = entidad_dos;
         entidades[nf][nc] = entidad_aux;
-        pos_f_jugador = nf;
-        pos_c_jugador = nc;
 	}
 	
 	private void subir_vacio(int f, int c) {
+		// Sube el "vacio" para generar la gravedad de las entidades (que caigan)
 		if(f > 0) {
-			aplicar_caida(f, c, f-1, c);
+			aplicar_intercambio_vacio(f, c, f-1, c);
 			subir_vacio(f-1,c);
 		}
 	}

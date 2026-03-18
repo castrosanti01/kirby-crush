@@ -63,6 +63,10 @@ public class Celda extends JLabel implements EntidadGrafica {
 	public void notificarse_cambio_posicion(){
 		mi_ventana.animar_movimiento(this);
 	}
+
+	public void notificarse_gravedad(){
+		mi_ventana.animar_gravedad(this);
+	}
 	
 	@Override
 	public void notificarse_detonar() {
