@@ -13,8 +13,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -38,6 +39,7 @@ import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
 import entidades.Potenciador;
+import entidades.Color;
 import factories.AbstractFactory;
 import factories.KirbyFactory;
 import factories.ZeldaFactory;
@@ -84,7 +86,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	public JLabel contadorMovimientos;	
 	public JLabel contadorTiempo;
 	public JLabel contadorPuntaje;
-	private List<JLabel> contadores;
+	private Map<Color, JLabel> contadores;
 	private List<Objetivo> objetivos;
 	
 	// ===================== ANIMACIONES Y TIMERS =====================
@@ -302,39 +304,35 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	}		
 
 	private void cargar_objetivos() {
-		contadores = new ArrayList<JLabel>();
+		contadores = new HashMap<>();
 		objetivos = mi_juego.actualizar_manager_objetivos();
-		JLabel contador_aux;
+
 		int filaAux = 96;
-		
-		for(Objetivo obejetivo : objetivos) {
-			if(obejetivo.get_image_path()!= null) {
-				contador_aux = new JLabel(String.valueOf(obejetivo.get_cantidad()));
-	    		contador_aux.setFont(new Font("MONOSPACED", Font.BOLD, 58));
-	    		contador_aux.setBounds(625, filaAux-5, 110, 70);
-	    		panelJuego.add(contador_aux, 0);
-	    		contadores.add(contador_aux);
-	    		
-	    		JLabel carameloGeneral = new JLabel();
-	    		carameloGeneral.setIcon(new ImageIcon(this.getClass().getResource(obejetivo.get_image_path())));
-	    		carameloGeneral.setBounds(550, filaAux, 60, 60);
-	    		panelJuego.add(carameloGeneral, 0);
-	    		
-	    		filaAux = filaAux + 60;
+
+		for (Objetivo objetivo : objetivos) {
+			if (objetivo.get_color() != null) {
+
+				JLabel contador = new JLabel(String.valueOf(objetivo.get_cantidad()));
+				contador.setFont(new Font("MONOSPACED", Font.BOLD, 58));
+				contador.setBounds(625, filaAux - 5, 110, 70);
+				panelJuego.add(contador, 0);
+				contadores.put(objetivo.get_color(), contador);
+
+				JLabel caramelo = new JLabel();
+				caramelo.setIcon(new ImageIcon(	this.getClass().getResource(objetivo.get_image_path())));
+				caramelo.setBounds(550, filaAux, 60, 60);
+				panelJuego.add(caramelo, 0);
+
+				filaAux += 60;
 			}
-		}
+    	}
 	}
 	
 	public void actualizar_objetivos(List<Objetivo> lista) {
-		int aux = 0;
-		if (contadores.size() > 0)
-		for(Objetivo objetivo : lista){
-			if(objetivo.get_cantidad() == 0)
-				contadores.remove(aux);
-			else
-				contadores.get(aux).setText(String.valueOf(objetivo.get_cantidad()));
-			aux++;
-		}
+		for (int i = 0; i < lista.size(); i++) {
+			Objetivo objetivo = lista.get(i);
+			animar_cambio_objetivo(contadores.get(objetivo.get_color()), objetivo.get_cantidad());
+		}		
 	}
 
 	// ===================== GANAR NIVEL =====================
@@ -736,11 +734,8 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		mostrarGameOver();
 	}
 
-	public void notificar_desuscripcion(int posicion) {
-		if(contadores.size() > posicion) {
-			contadores.get(posicion).setText("0");
-			contadores.remove(posicion);
-		}
+	public void notificar_desuscripcion(Color color) {
+		contadores.get(color).setText("AA");
 	}
 	
 	public void notificarse_animacion_en_progreso() {
@@ -780,6 +775,10 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	
 	public void animar_creacion_con_delay(Celda celda) {
 		mi_animador.animar_creacion_con_delay(celda);
+	}
+
+	public void animar_cambio_objetivo(JLabel contador, int i){
+		mi_animador.animar_cambio_objetivo(contador, i);
 	}
 	
 }

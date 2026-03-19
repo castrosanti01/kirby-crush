@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JLabel;
+
 import GUI.Celda;
 import GUI.Ventana;
 import GUI.VentanaNotificable;
@@ -53,6 +55,11 @@ public class CentralAnimaciones implements ManejadorAnimaciones {
 
 	public void animar_creacion_con_delay(Celda celda) {
 		Animador animador = new AnimadorCreacionConDelay(this, celda, 400);
+		agregar_animador_y_lanzar_pendientes(animador);
+	}
+
+	public void animar_cambio_objetivo(JLabel contador, int i) {
+		Animador animador = new AnimadorCambioObjetivo(this, contador, i);
 		agregar_animador_y_lanzar_pendientes(animador);
 	}
 

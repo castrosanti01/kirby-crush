@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.util.List;
 import entidades.Entidad;
 import entidades.Potenciador;
+import entidades.Color;
 import factories.AbstractFactory;
 import GUI.EntidadGrafica;
 import GUI.Ventana;
@@ -131,11 +132,17 @@ public class Juego {
 	}
 
 	public void chequeo_nivel() {
-		boolean termino_nivel = manager_objetivos.get_lista().size() == 0;
+		boolean termino_nivel = true;
+
+		for (Objetivo objetivo : manager_objetivos.get_lista()) {
+			if (objetivo.get_cantidad() > 0) {
+				termino_nivel = false;
+				break;
+			}
+		}
+
 		if (termino_nivel) {
 			mi_ventana.ganarNivel();
-			if (nivelActual() == 5)
-				mi_ventana.terminarJuego();
 		}
 	}
 
@@ -174,8 +181,8 @@ public class Juego {
 		mi_ventana.notificar_perder();
 	}
 
-	public void notificar_desuscripcion(int posicion) {
-		mi_ventana.notificar_desuscripcion(posicion);
+	public void notificar_desuscripcion(Color color) {
+		mi_ventana.notificar_desuscripcion(color);
 	}
 
 	public void notificar_sumar_puntaje(int puntaje_a_sumar) {

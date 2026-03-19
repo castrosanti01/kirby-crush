@@ -125,23 +125,23 @@ public class GeneradorNivel {
 
      //Seteo de objetivos
       if (verdes > 0) {
-    	  objetivosVerdes = new Objetivo("/imagenes/caramelos/"+generador.toString()+"-1.png", verdes);
+    	  objetivosVerdes = new Objetivo("/imagenes/caramelos/"+generador.toString()+"-1.png", verdes, Color.VERDE);
     	  manager_objetivos.suscribirse(objetivosVerdes);
       }
       if (amarillos > 0) {
-    	  objetivosAmarillos = new Objetivo("/imagenes/caramelos/"+generador.toString()+"-2.png", amarillos);
+    	  objetivosAmarillos = new Objetivo("/imagenes/caramelos/"+generador.toString()+"-2.png", amarillos, Color.AMARILLO);
     	  manager_objetivos.suscribirse(objetivosAmarillos);
       }
       if (azules > 0) {
-    	  objetivosAzules = new Objetivo("/imagenes/caramelos/"+generador.toString()+"-3.png", azules);
+    	  objetivosAzules = new Objetivo("/imagenes/caramelos/"+generador.toString()+"-3.png", azules, Color.AZUL);
     	  manager_objetivos.suscribirse(objetivosAzules);
       }
       if (violetas > 0 ) {
-    	  objetivosVioletas = new Objetivo("/imagenes/caramelos/"+generador.toString()+"-4.png", violetas);
+    	  objetivosVioletas = new Objetivo("/imagenes/caramelos/"+generador.toString()+"-4.png", violetas, Color.VIOLETA);
     	  manager_objetivos.suscribirse(objetivosVioletas);
       }
       if (rosas > 0) {
-    	  objetivosRosas = new Objetivo ("/imagenes/caramelos/"+generador.toString()+"-5.png", rosas);
+    	  objetivosRosas = new Objetivo ("/imagenes/caramelos/"+generador.toString()+"-5.png", rosas, Color.ROSA);
     	  manager_objetivos.suscribirse(objetivosRosas);
       }
 

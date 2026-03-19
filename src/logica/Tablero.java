@@ -363,17 +363,13 @@ public class Tablero {
 	}
 	
 	private void actualizar_objetivos(List<Objetivo> lista_objetivos, Entidad e) {
-		int posicion = 0;
-		boolean no_repetir = true;
 		for(Objetivo objetivo : lista_objetivos) {
 			objetivo.chequear_objetivo(e);
-			if(no_repetir && objetivo.get_cantidad() == 0) {
-				no_repetir = false;
-				mi_juego.notificar_desuscripcion(posicion);
-				manager_objetivos.desuscribirse(objetivo);
+			if(objetivo.get_cantidad() == 0) {
+				//mi_juego.notificar_desuscripcion(objetivo.get_color());
+				//manager_objetivos.desuscribirse(objetivo);
 				mi_juego.chequeo_nivel();
 			}
-			posicion++;
 		}
 	}
 	
