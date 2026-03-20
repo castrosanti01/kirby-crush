@@ -70,6 +70,11 @@ public class CentralAnimaciones implements ManejadorAnimaciones {
 		agregar_animador_y_lanzar_pendientes(animador);
     }
 
+	public void animar_perder_nivel(JLayeredPane panel, JLabel label, JButton boton1, JButton boton2) {
+		Animador animador = new AnimadorPerderNivel(this, panel, label, boton1, boton2);
+		agregar_animador_y_lanzar_pendientes(animador);
+    }
+
 	protected void agregar_animador_y_lanzar_pendientes(Animador animador) {
 		synchronized (this) {
 			ventana.notificarse_animacion_en_progreso();

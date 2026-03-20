@@ -417,7 +417,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	        @Override
 	        protected Void doInBackground() {
 	            try {
-	                Thread.sleep(100);
+	                Thread.sleep(2000);
 	            } catch (InterruptedException e) {
 	                e.printStackTrace();
 	            }
@@ -442,13 +442,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	            exit.setOpaque(false);
 	            exit.setBorderPainted(false);
 	            exit.setContentAreaFilled(false);
-	            
-	            panelJuego.add(gameOver, 0);
-	            panelJuego.add(retry, 0);
-	            panelJuego.add(exit, 0);
-	            panelJuego.setFocusable(false);
-	            panelJuego.revalidate();
-	            panelJuego.repaint();
 	            
 	            retry.addActionListener(new ActionListener() {
 	                public void actionPerformed (ActionEvent e) {
@@ -477,6 +470,9 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	                    }
 	    		    }
 	    		});
+
+				animar_perder_nivel(panelJuego, gameOver, retry, exit);
+
 	        }
 	    };
 
@@ -784,6 +780,10 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 
 	public void animar_ganar_nivel(JLayeredPane panel, JLabel label, JButton boton) {
 		mi_animador.animar_ganar_nivel(panel, label, boton);
+	}
+
+	public void animar_perder_nivel(JLayeredPane panel, JLabel label, JButton boton, JButton exit) {
+		mi_animador.animar_perder_nivel(panel, label, boton, exit);
 	}
 	
 }
