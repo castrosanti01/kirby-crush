@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 
 import GUI.Celda;
 import GUI.Ventana;
@@ -62,6 +64,11 @@ public class CentralAnimaciones implements ManejadorAnimaciones {
 		Animador animador = new AnimadorCambioObjetivo(this, contador, i);
 		agregar_animador_y_lanzar_pendientes(animador);
 	}
+
+	public void animar_ganar_nivel(JLayeredPane panel, JLabel label, JButton boton) {
+		Animador animador = new AnimadorGanarNivel(this, panel, label, boton);
+		agregar_animador_y_lanzar_pendientes(animador);
+    }
 
 	protected void agregar_animador_y_lanzar_pendientes(Animador animador) {
 		synchronized (this) {

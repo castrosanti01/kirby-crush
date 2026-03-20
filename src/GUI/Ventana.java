@@ -353,7 +353,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	            victoria.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/PanelVictoria.gif")));
 	            victoria.setBounds(panelJuego.getWidth() / 2 - 150, panelJuego.getHeight() / 2 - 150, 300, 300);
 	            victoria.setVisible(true);
-	            panelJuego.add(victoria, 0);
 
 	            JButton levelUp = new JButton();
 	            levelUp.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/BotonLevelUp.png")));
@@ -361,7 +360,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	            levelUp.setOpaque(false);
 	            levelUp.setBorderPainted(false);
 	            levelUp.setContentAreaFilled(false);
-	            panelJuego.add(levelUp, 0);
 	            
 	            levelUp.addActionListener(new ActionListener() {
 	                public void actionPerformed (ActionEvent e) {
@@ -393,6 +391,9 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	                	}
 	                }
 	            });
+
+				animar_ganar_nivel(panelJuego, victoria, levelUp);
+
 	        }
 	    };
 	    worker.execute();
@@ -779,6 +780,10 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 
 	public void animar_cambio_objetivo(JLabel contador, int i){
 		mi_animador.animar_cambio_objetivo(contador, i);
+	}
+
+	public void animar_ganar_nivel(JLayeredPane panel, JLabel label, JButton boton) {
+		mi_animador.animar_ganar_nivel(panel, label, boton);
 	}
 	
 }

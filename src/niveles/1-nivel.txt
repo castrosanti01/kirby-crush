@@ -9,9 +9,7 @@ Movimientos: 30
 
 # Objetivo del nivel
 VerdesFaltantes: 7
-RosasFaltantes: 5
-VioletasFaltantes: 5
-AmarillosFaltantes: 5
+
 
 # Tiempo límite en segundos
 Tiempo: 0

@@ -366,8 +366,6 @@ public class Tablero {
 		for(Objetivo objetivo : lista_objetivos) {
 			objetivo.chequear_objetivo(e);
 			if(objetivo.get_cantidad() == 0) {
-				//mi_juego.notificar_desuscripcion(objetivo.get_color());
-				//manager_objetivos.desuscribirse(objetivo);
 				mi_juego.chequeo_nivel();
 			}
 		}
