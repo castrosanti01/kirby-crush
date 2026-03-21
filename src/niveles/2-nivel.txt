@@ -5,11 +5,11 @@ Filas: 6
 Columnas: 6
 
 # Cantidad de movimientos disponibles
-Movimientos: 6
+Movimientos: 7
 
 # Objetivo del nivel
-VerdesFaltantes: 10
-AmarillosFaltantes: 8
+VerdesFaltantes: 5
+AmarillosFaltantes: 5
 
 # Tiempo límite en segundos
 Tiempo: 0

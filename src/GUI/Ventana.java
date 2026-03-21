@@ -316,7 +316,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 
 				JLabel contador = new JLabel(String.valueOf(objetivo.get_cantidad()));
 				contador.setFont(new Font("MONOSPACED", Font.BOLD, 58));
-				contador.setBounds(625, filaAux - 5, 110, 70);
+				contador.setBounds(615, filaAux - 5, 110, 70);
 				panelJuego.add(contador, 0);
 				contadores.put(objetivo.get_color(), contador);
 

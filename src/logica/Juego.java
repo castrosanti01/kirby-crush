@@ -26,10 +26,11 @@ public class Juego {
 	protected ManagerObjetivos manager_objetivos;
 	protected TopJugadores ranking;
 	protected AbstractFactory skin;
-	private Jugador jugador_actual;  
+	protected Jugador jugador_actual;  
 	protected int movimientos;
 	protected int tiempo_restante;
 	protected int contador_puntos;
+	protected boolean nivel_ganado;
 	public int vidas = 3;
 
 	public Juego() {
@@ -43,6 +44,7 @@ public class Juego {
 		String nivelPath = "/niveles/" + nivel + "-nivel.txt";
 		mi_nivel = GeneradorNivel.cargar_nivel_y_tablero(getClass().getResourceAsStream(nivelPath), generador, mi_tablero);
 		skin = generador;
+		nivel_ganado = false;
 	}
 
 	public void asociar() {
@@ -131,18 +133,19 @@ public class Juego {
 		return vidas;
 	}
 
-	public void chequeo_nivel() {
-		boolean termino_nivel = true;
+	public void chequeo_nivel() { 
+		boolean objetivosTerminados = true;
 
 		for (Objetivo objetivo : manager_objetivos.get_lista()) {
 			if (objetivo.get_cantidad() > 0) {
-				termino_nivel = false;
+				objetivosTerminados = false;
 				break;
 			}
 		}
 
-		if (termino_nivel) {
+		if (objetivosTerminados && !nivel_ganado) {
 			mi_ventana.ganarNivel();
+			nivel_ganado = true;
 		}
 	}
 
