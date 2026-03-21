@@ -5,10 +5,10 @@ Filas: 6
 Columnas: 6
 
 # Cantidad de movimientos disponibles
-Movimientos: 3
+Movimientos: 5
 
 # Objetivo del nivel
-VerdesFaltantes: 7
+VerdesFaltantes: 10
 
 
 # Tiempo límite en segundos
@@ -19,6 +19,6 @@ Tablero: (crear)
 4 2 1 3 2 2
 3 4 3 1 4 1
 5 1 5 5 2 1
-2 1 3 1 1 2
-1 5 1 4 5 4
-1 2 5 5 2 4
+2 1 3 4 1 2
+1 5 2 4 5 4
+2 1 5 5 2 4

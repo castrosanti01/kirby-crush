@@ -191,6 +191,8 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 				Generador = new ZeldaFactory();
 				mi_juego.setGenerador(Generador);
 				setTitle(Generador.toString() + " Crush");
+				setIconImage(new ImageIcon(this.getClass().getResource("/imagenes/icono/zeldaicon.png")).getImage());
+
 				
 				prepararPanelSeleccionNiveles();
 				cardLayout.show(mainPanel, "seleccionNiveles");
@@ -201,20 +203,20 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 
 	// ===================== PANEL DE SELECCIÓN DE NIVELES =====================
 	private void prepararPanelSeleccionNiveles() {
-		Icon imgIcon = cargarIcono("/imagenes/niveles/"+Generador.toString()+"/PanelSeleccion.jpg");
+		Icon imgIcon = cargarIcono("/imagenes/niveles/"+Generador.toString()+"/PanelSeleccion.png");
 		JLabel fondo = new JLabel(imgIcon);
 		fondo.setBounds(0, 0, WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
 		panelSeleccionNiveles.add(fondo, 0);
 
 		Icon iconVidas = cargarIcono("/imagenes/niveles/vidas.png");
 		vida1 = new JLabel(iconVidas);
-		vida1.setBounds(275, 350, 75, 75);
+		vida1.setBounds(265, 360, 75, 75);
 		panelSeleccionNiveles.add(vida1, 0);
 		vida2 = new JLabel(iconVidas);
-		vida2.setBounds(325, 350, 75, 75);
+		vida2.setBounds(315, 360, 75, 75);
 		panelSeleccionNiveles.add(vida2, 0);
 		vida3 = new JLabel(iconVidas);
-		vida3.setBounds(375, 350, 75, 75);
+		vida3.setBounds(365, 360, 75, 75);
 		panelSeleccionNiveles.add(vida3, 0);
 
 		botonRankingNiveles = new JButton();
@@ -231,17 +233,17 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	}
 	
 	private void agregarBotonesNiveles() {
-		botonNivel1 = crearBotonNivel(Generador.toString()+"/BotonNivel1.png", 200, 180, 100, 100);
+		botonNivel1 = crearBotonNivel(Generador.toString()+"/BotonNivel1.png", 180, 180, 100, 100);
 		panelSeleccionNiveles.add(botonNivel1, 0);
 		botonNivel1.addActionListener(e -> iniciarNivel(1));
 		
-		botonNivel2 = crearBotonNivel(Generador.toString()+"/BotonNivelConCandado.png", 315, 180, 100, 100);
+		botonNivel2 = crearBotonNivel(Generador.toString()+"/BotonNivelConCandado.png", 305, 180, 100, 100);
 		panelSeleccionNiveles.add(botonNivel2, 0);
 		
 		botonNivel3 = crearBotonNivel(Generador.toString()+"/BotonNivelConCandado.png", 425, 180, 100, 100);
 		panelSeleccionNiveles.add(botonNivel3, 0);
 		
-		botonNivel4 = crearBotonNivel(Generador.toString()+"/BotonNivelConCandado.png", 265, 260, 100, 100);
+		botonNivel4 = crearBotonNivel(Generador.toString()+"/BotonNivelConCandado.png", 245, 260, 100, 100);
 		panelSeleccionNiveles.add(botonNivel4, 0);
 
 		botonNivel5 = crearBotonNivel(Generador.toString()+"/BotonNivelConCandado.png", 365, 260, 100, 100);
@@ -320,6 +322,15 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 
 				JLabel caramelo = new JLabel();
 				caramelo.setIcon(new ImageIcon(	this.getClass().getResource(objetivo.get_image_path())));
+				Icon icon = caramelo.getIcon();
+				if (icon != null) {
+					int width = icon.getIconWidth();
+					int height = icon.getIconHeight();
+					double scaleFactor = Math.min((double) SIZE_LABEL / width, (double) SIZE_LABEL / height);
+					int newWidth = (int) (width * scaleFactor);
+					int newHeight = (int) (height * scaleFactor);
+					caramelo.setIcon(new ImageIcon(((ImageIcon) icon).getImage().getScaledInstance(newWidth, newHeight, java.awt.Image.SCALE_SMOOTH)));
+				}
 				caramelo.setBounds(550, filaAux, 60, 60);
 				panelJuego.add(caramelo, 0);
 
@@ -524,14 +535,9 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		cardLayout.show(mainPanel, "final");
 
 		JLabel kirbylink = new JLabel();
-		kirbylink.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/PanelFinal.gif")));
-		kirbylink.setBounds(0, 0, 539, 539);
+		kirbylink.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/"+Generador.toString()+"/PanelFinal.png")));
+		kirbylink.setBounds(0, 0, WINDOW_WIDTH_GAME, WINDOW_HEIGHT_GAME);
 		panelFinal.add(kirbylink, JLayeredPane.DEFAULT_LAYER);
-		
-		JLabel graciasPorJugar = new JLabel();
-		graciasPorJugar.setIcon(new ImageIcon(this.getClass().getResource("/imagenes/niveles/graciasPorJugar.png")));
-		graciasPorJugar.setBounds(170, 200, 300, 90);
-		panelFinal.add(graciasPorJugar, 0);
 		
 		panelFinal.revalidate();
 		panelFinal.repaint();
