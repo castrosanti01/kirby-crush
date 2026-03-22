@@ -161,7 +161,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		panel.add(fondo, 0);
 		
 		botonKirby = new JButton();
-		Icon iconKirby = cargarIcono("/imagenes/niveles/kirby/BotonKirby.png");
+		Icon iconKirby = cargarIcono("/imagenes/niveles/Kirby/BotonKirby.png");
 		botonKirby.setIcon(iconKirby);
 		botonKirby.setBounds(100, 550, 130, 40);
 		botonKirby.setOpaque(false);
@@ -181,7 +181,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		});
 		
 		botonZelda = new JButton();
-		Icon iconZelda = cargarIcono("/imagenes/niveles/zelda/BotonZelda.png");
+		Icon iconZelda = cargarIcono("/imagenes/niveles/Zelda/BotonZelda.png");
 		botonZelda.setIcon(iconZelda);
 		botonZelda.setBounds(465, 550, 130, 40);
 		botonZelda.setOpaque(false);
@@ -684,7 +684,8 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	// ===================== MUSICA =====================
 	private void cargarMusica() {
 		try {
-			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(getClass().getResourceAsStream("/musica/" + Generador.toString() + "-music.wav"));
+			java.net.URL url = getClass().getResource("/musica/" + Generador.toString() + "-music.wav");
+			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
 			Clip musica = AudioSystem.getClip();
 			musica.open(audioInputStream);
 			musica.start();
