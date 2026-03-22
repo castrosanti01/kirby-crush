@@ -8,7 +8,7 @@ Columnas: 6
 Movimientos: 7
 
 # Objetivo del nivel
-VerdesFaltantes: 4
+VerdesFaltantes: 6
 
 
 # Tiempo límite en segundos

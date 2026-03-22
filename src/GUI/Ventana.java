@@ -83,9 +83,10 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	private boolean quedanVidas = true;
 	
 	// ===================== COMPONENTES DE INFORMACIÓN =====================
-	public JLabel contadorMovimientos;	
-	public JLabel contadorTiempo;
-	public JLabel contadorPuntaje;
+	private JLabel contadorMovimientos;	
+	//private JLabel contadorTiempo;
+	private JLabel contadorPuntaje;
+	private JLabel labelPuntaje;
 	private Map<Color, JLabel> contadores;
 	private List<Objetivo> objetivos;
 	
@@ -172,6 +173,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 				Generador = new KirbyFactory();
 				mi_juego.setGenerador(Generador);
 				setTitle(Generador.toString() + " Crush");
+				cargarMusica();
 				
 				prepararPanelSeleccionNiveles();
 				cardLayout.show(mainPanel, "seleccionNiveles");
@@ -192,7 +194,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 				mi_juego.setGenerador(Generador);
 				setTitle(Generador.toString() + " Crush");
 				setIconImage(new ImageIcon(this.getClass().getResource("/imagenes/icono/zeldaicon.png")).getImage());
-
+				cargarMusica();
 				
 				prepararPanelSeleccionNiveles();
 				cardLayout.show(mainPanel, "seleccionNiveles");
@@ -285,11 +287,16 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
         botonRankingJuego.addActionListener(e -> mostrarRanking());
 		panelJuego.add(botonRankingJuego, 0);
 		
+        labelPuntaje = new JLabel("Puntaje: ");
+        labelPuntaje.setFont(new Font("Monospaced", Font.BOLD, 50));
+        labelPuntaje.setBounds(70, 540, 500, 70);
+        panelJuego.add(labelPuntaje, 0);
+
 		int puntaje = mi_juego.get_jugador_actual().get_puntaje_acumulado();
-        contadorPuntaje = new JLabel("Puntaje: "+puntaje);
-        contadorPuntaje.setFont(new Font("Monospaced", Font.BOLD, 50));
-        contadorPuntaje.setBounds(70, 540, 500, 70);
-        panelJuego.add(contadorPuntaje, 0);
+		contadorPuntaje = new JLabel(String.valueOf(puntaje));
+		contadorPuntaje.setFont(new Font("Monospaced", Font.BOLD, 50));
+		contadorPuntaje.setBounds(340, 540, 500, 70);
+		panelJuego.add(contadorPuntaje, 0);
 
 		int movimientos = mi_juego.get_movimientos();
         contadorMovimientos = new JLabel("Movimientos: "+movimientos);
@@ -344,6 +351,10 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 			Objetivo objetivo = lista.get(i);
 			animar_cambio_objetivo(contadores.get(objetivo.get_color()), objetivo.get_cantidad());
 		}		
+	}
+
+	public void actualizar_puntaje(int puntaje_a_sumar) {
+		animar_cambio_objetivo(contadorPuntaje, (mi_juego.get_jugador_actual().get_puntaje_acumulado() + mi_juego.get_jugador_actual().get_puntaje_nivel_actual()));	
 	}
 
 	// ===================== GANAR NIVEL =====================
@@ -671,7 +682,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	}
 	
 	// ===================== MUSICA =====================
-	@SuppressWarnings("unused")
 	private void cargarMusica() {
 		try {
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(getClass().getResourceAsStream("/musica/" + Generador.toString() + "-music.wav"));
@@ -719,10 +729,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		panelJuego.repaint();
 	}
 
-	public void actualizar_puntaje(int puntaje_a_sumar) {
-		mi_juego.get_jugador_actual().actualizar_puntaje_nivel_actual(puntaje_a_sumar);
-		contadorPuntaje.setText("Puntaje: " + (mi_juego.get_jugador_actual().get_puntaje_acumulado() + mi_juego.get_jugador_actual().get_puntaje_nivel_actual()));
-	}
 	
 	private Icon cargarIcono(String ruta) {
 		try {
@@ -737,8 +743,8 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		mostrarGameOver();
 	}
 
-	public void notificar_desuscripcion(Color color) {
-		contadores.get(color).setText("AA");
+	public void notificar_movimiento(int movimientos) {
+		contadorMovimientos.setText("Movimientos: " + movimientos);
 	}
 	
 	public void notificarse_animacion_en_progreso() {

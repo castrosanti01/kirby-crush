@@ -4,7 +4,6 @@ import java.awt.EventQueue;
 import java.util.List;
 import entidades.Entidad;
 import entidades.Potenciador;
-import entidades.Color;
 import factories.AbstractFactory;
 import GUI.EntidadGrafica;
 import GUI.Ventana;
@@ -108,9 +107,10 @@ public class Juego {
 
 	public void notificarMovimiento() {
 		movimientos--;
-		mi_ventana.contadorMovimientos.setText("Movimientos: " + movimientos);
-		if (movimientos == 0)
+		mi_ventana.notificar_movimiento(movimientos);
+		if (movimientos == 0 && !nivel_ganado) {
 			mi_ventana.notificar_perder();
+		}
 	}
 
 	public void set_movimientos() {
@@ -163,9 +163,12 @@ public class Juego {
 		mi_ventana.actualizar_objetivos(manager_objetivos.get_lista());
 	}
 
+	public void actualizar_puntaje() {
+		mi_ventana.actualizar_puntaje(jugador_actual.get_puntaje_nivel_actual());
+	}
+
 	public void sumarPuntos(){
 		jugador_actual.sumar_puntos_del_nivel();
-		mi_ventana.contadorPuntaje.setText("Puntaje: " + jugador_actual.get_puntaje_acumulado());
 	}
 
 	public int nivelActual() {
@@ -180,16 +183,8 @@ public class Juego {
 		return skin;
 	}
 
-	public void notificar_perder() {
-		mi_ventana.notificar_perder();
-	}
-
-	public void notificar_desuscripcion(Color color) {
-		mi_ventana.notificar_desuscripcion(color);
-	}
-
 	public void notificar_sumar_puntaje(int puntaje_a_sumar) {
-		mi_ventana.actualizar_puntaje(puntaje_a_sumar);
+		get_jugador_actual().actualizar_puntaje_nivel_actual(puntaje_a_sumar);
 	}
 
 	public Jugador get_jugador_actual() {

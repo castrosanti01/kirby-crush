@@ -291,6 +291,7 @@ public class Tablero {
 			}
 		}
 		mi_juego.actualizar_objetivos();
+		mi_juego.actualizar_puntaje();
 		
 		int fila_aux = -1;
 
@@ -369,10 +370,6 @@ public class Tablero {
 				mi_juego.chequeo_nivel();
 			}
 		}
-	}
-	
-	public void notificar_perder() {
-		mi_juego.notificar_perder();
 	}
 	
 	public void notificar_sumar_puntaje(int puntaje_a_sumar) {
