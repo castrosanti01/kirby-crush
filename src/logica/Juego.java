@@ -35,7 +35,6 @@ public class Juego {
 	public Juego() {
 		mi_tablero = new Tablero(this);
 		mi_ventana = new Ventana(this);
-		ranking = new TopJugadores();
 		jugador_actual = new Jugador();
 	}
 

@@ -65,4 +65,8 @@ public class Jugador implements Comparable<Jugador>, Serializable{
 	public int compareTo(Jugador otroJugador) {
 		return this.puntaje_acumulado.compareTo(otroJugador.get_puntaje_acumulado());
 	}
+
+	public void actualizar_puntaje_acumulado(Integer get_puntaje_acumulado) {
+		this.puntaje_acumulado = get_puntaje_acumulado;
+	}
 }

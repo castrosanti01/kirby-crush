@@ -35,7 +35,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
-import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
 import entidades.Potenciador;
@@ -94,8 +93,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	private int animaciones_pendientes;
 	private boolean bloquear_intercambios;
 	private boolean cartelWin;
-	private Timer timerglobal;
-
 	
 	// ===================== CONFIGURACIÓN VENTANA =====================
 	public Ventana(Juego j) {
@@ -107,7 +104,6 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 		animaciones_pendientes = 0;
 		bloquear_intercambios = false;
 		cartelWin = false;
-		timerglobal = new Timer(10000, null);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Kirby & Zelda Crush");
@@ -558,13 +554,9 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 
 	// ===================== RANKING =====================
 	private void mostrarRanking() {
-		if (timerglobal != null) 
-			timerglobal.stop();
         tablaPuntajes();
         dialogTablaRanking.setVisible(true);
         panelJuego.requestFocusInWindow();
-        if (timerglobal != null) 
-			timerglobal.start();
 	}
 
 	private void tablaPuntajes() {
@@ -626,11 +618,24 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	        public void actionPerformed(ActionEvent e) {
 	            String nombre = nombreTextField.getText().trim();
 	            if (nombre != null && !nombre.isEmpty()) {
-	            	mi_juego.get_jugador_actual().set_nombre(nombre);
-	            	mi_juego.getTopJugadores().agregar_jugador(mi_juego.get_jugador_actual());
-	                frameNombreJugador.dispose(); 
+					Jugador jugadorExistente = mi_juego.getTopJugadores().existe_jugador(nombre);
+					if(jugadorExistente != null) {
+						int puntajaExistente = jugadorExistente.get_puntaje_acumulado();
+						int puntajeActual = mi_juego.get_jugador_actual().get_puntaje_acumulado();
+						if(puntajaExistente < puntajeActual) {
+							jugadorExistente.actualizar_puntaje_acumulado(puntajeActual);
+							JOptionPane.showMessageDialog(frameNombreJugador, "¡Felicidades " + nombre + "!" + " Superaste tu puntaje anterior", "Nuevo récord", JOptionPane.INFORMATION_MESSAGE);
+						}
+						else{
+							JOptionPane.showMessageDialog(frameNombreJugador, nombre + ", hiciste: " + puntajeActual + " puntos y no superaste tu récord de " + puntajaExistente, "Sin récord", JOptionPane.INFORMATION_MESSAGE);
+						}
+					} else {
+						mi_juego.get_jugador_actual().set_nombre(nombre);
+						mi_juego.getTopJugadores().agregar_jugador(mi_juego.get_jugador_actual());
+					}
+					frameNombreJugador.dispose(); 
 					serializacionRanking();
-					mostrarRanking();			        
+					mostrarRanking();
 	            } else {
 	                JOptionPane.showMessageDialog(frameNombreJugador, "Por favor, ingrese nombre de jugador.", "Campo vacío", JOptionPane.WARNING_MESSAGE);
 	            }
@@ -649,7 +654,7 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	
 	private void serializacionRanking() {
 		try {
-			FileOutputStream fileOutputStream = new FileOutputStream("./src/puntaje/ranking.tdp");
+			FileOutputStream fileOutputStream = new FileOutputStream("ranking.tdp");
 		    ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 		    objectOutputStream.writeObject(mi_juego.getTopJugadores());
 		    objectOutputStream.flush();
@@ -665,19 +670,16 @@ public class Ventana extends JFrame implements VentanaAnimable, VentanaNotificab
 	
 	private void deserializacionRanking() {
 		try {
-			FileInputStream fileInputStream = new FileInputStream("./src/puntaje/ranking.tdp");
+			FileInputStream fileInputStream = new FileInputStream("ranking.tdp");
 		    ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 		    mi_juego.set_top_jugadores((TopJugadores) objectInputStream.readObject());
 		    objectInputStream.close();
 		}
 		catch(FileNotFoundException e) {
-			//No va nada acá porque si no encuentra el archivo lo crea
+			 mi_juego.set_top_jugadores(new TopJugadores());
 		}
-		catch(IOException e) {
-			e.printStackTrace();
-		}
-		catch(ClassNotFoundException e) {
-			e.printStackTrace();
+		catch (IOException | ClassNotFoundException e) {
+        e.printStackTrace();
 		}
 	}
 	
